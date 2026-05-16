@@ -35,6 +35,24 @@ git tag -a v0.1.0 -m "Floci UI v0.1.0"
 git push origin v0.1.0
 ```
 
+Pushing a `v*` tag starts the release workflow. The workflow validates on Linux,
+then builds native bundles on Linux, Windows, and macOS before creating one draft
+GitHub release.
+
+Manual runs can provide a release tag through the workflow input. The tag must
+start with `v`, such as `v0.1.0`, to avoid accidentally publishing a branch name.
+
+## Release Artifacts
+
+The release workflow attaches the native bundles produced by Tauri:
+
+- Linux: `.AppImage`, `.deb`, and `.rpm`.
+- Windows: `.msi` and `.exe`.
+- macOS: `.dmg` and a compressed `.app.tar.gz` app bundle.
+
+Windows and macOS artifacts are unsigned until maintainers add platform signing
+and notarization credentials.
+
 ## Release Notes
 
 Release notes should include:

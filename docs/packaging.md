@@ -15,6 +15,10 @@ Linux builds require the system packages documented by Tauri for WebKit, GTK,
 and app indicator support. Windows and macOS builds require their normal native
 toolchains.
 
+The GitHub release workflow builds each desktop target on its native hosted
+runner. Linux bundles are built on Ubuntu, Windows bundles on Windows, and macOS
+bundles on macOS.
+
 ## Local Package Build
 
 Build frontend assets:
@@ -37,6 +41,12 @@ ignored by git.
 Artifact names and extensions depend on the host platform and installed Tauri
 bundlers. Typical outputs include installers or app bundles under
 `src-tauri/target/release/bundle/`.
+
+The automated release workflow collects these artifacts:
+
+- Linux: `.AppImage`, `.deb`, and `.rpm`.
+- Windows: `.msi` and `.exe`.
+- macOS: `.dmg` and `.app.tar.gz`.
 
 ## Signing and Notarization
 
