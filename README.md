@@ -15,19 +15,6 @@ This project targets local development and local emulator workflows. It is not a
 general AWS console replacement, and it intentionally refuses non-local endpoint
 hosts for `FLOCI_AWS_ENDPOINT_URL`.
 
-## Status
-
-Floci UI is preparing for its first public source release. APIs, UI details, and
-packaging flow may change before `0.1.0`.
-
-Repository/social preview image: [assets/floci-ui-repo-card.png](assets/floci-ui-repo-card.png).
-
-Screenshot and GIF placeholders:
-
-- Dashboard overview: pending first public screenshot.
-- Service inventory view: pending first public screenshot.
-- Resource detail view: pending first public screenshot.
-
 ## Features
 
 - Desktop shell powered by Tauri 2.
@@ -110,12 +97,12 @@ http://localhost:4566/_floci/health
 
 ## Configuration
 
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `FLOCI_AWS_ENDPOINT_URL` | `http://localhost:4566` | Local Floci endpoint |
-| `FLOCI_AWS_REGION` | `us-east-1` | Region shown by the UI and used by AWS SDK clients |
-| `AWS_ACCESS_KEY_ID` | `test` | Local emulator access key |
-| `AWS_SECRET_ACCESS_KEY` | `test` | Local emulator secret key |
+| Variable                 | Default                 | Purpose                                            |
+| ------------------------ | ----------------------- | -------------------------------------------------- |
+| `FLOCI_AWS_ENDPOINT_URL` | `http://localhost:4566` | Local Floci endpoint                               |
+| `FLOCI_AWS_REGION`       | `us-east-1`             | Region shown by the UI and used by AWS SDK clients |
+| `AWS_ACCESS_KEY_ID`      | `test`                  | Local emulator access key                          |
+| `AWS_SECRET_ACCESS_KEY`  | `test`                  | Local emulator secret key                          |
 
 For safety, `FLOCI_AWS_ENDPOINT_URL` is restricted to loopback hosts and local
 emulator aliases such as `localhost`, `127.0.0.1`, `[::1]`, `floci`,
