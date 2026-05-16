@@ -737,9 +737,25 @@ const PREVIEW_SERVICE_DESCRIPTORS: &[PreviewServiceDescriptor] = &[
         "networking",
         "REST APIs, resources, methods, integrations, and stages.",
         "Network, observability, and edge",
-        "unsupported",
-        &["rest-api", "resource", "method", "stage"],
-        &[],
+        "managed",
+        &[
+            "rest-api",
+            "resource",
+            "method",
+            "integration",
+            "deployment",
+            "stage",
+        ],
+        &[
+            "list",
+            "inspect",
+            "create_rest_api",
+            "create_resource",
+            "put_method",
+            "put_integration",
+            "create_deployment",
+            "delete_rest_api",
+        ],
     ),
     preview_service(
         "apigatewayv2",
@@ -747,9 +763,24 @@ const PREVIEW_SERVICE_DESCRIPTORS: &[PreviewServiceDescriptor] = &[
         "networking",
         "HTTP/WebSocket APIs, routes, integrations, deployments, and stages.",
         "Network, observability, and edge",
-        "unsupported",
-        &["api", "route", "integration", "stage"],
-        &[],
+        "managed",
+        &[
+            "api",
+            "route",
+            "integration",
+            "deployment",
+            "stage",
+            "authorizer",
+        ],
+        &[
+            "list",
+            "inspect",
+            "create_api",
+            "create_route",
+            "create_integration",
+            "create_deployment",
+            "delete_api",
+        ],
     ),
     preview_service(
         "elbv2",
@@ -757,9 +788,23 @@ const PREVIEW_SERVICE_DESCRIPTORS: &[PreviewServiceDescriptor] = &[
         "networking",
         "Load balancers, listeners, target groups, and target health.",
         "Network, observability, and edge",
-        "unsupported",
-        &["load-balancer", "listener", "target-group"],
-        &[],
+        "managed",
+        &[
+            "load-balancer",
+            "listener",
+            "listener-rule",
+            "target-group",
+            "target",
+        ],
+        &[
+            "list",
+            "inspect",
+            "create_target_group",
+            "register_target",
+            "deregister_target",
+            "delete_listener",
+            "delete_load_balancer",
+        ],
     ),
     preview_service(
         "route53",
@@ -767,9 +812,15 @@ const PREVIEW_SERVICE_DESCRIPTORS: &[PreviewServiceDescriptor] = &[
         "networking",
         "Hosted zones, record sets, reusable delegation sets, and health checks.",
         "Network, observability, and edge",
-        "unsupported",
-        &["hosted-zone", "record-set", "health-check"],
-        &[],
+        "managed",
+        &["hosted-zone", "record-set", "health-check", "change-batch"],
+        &[
+            "list",
+            "inspect",
+            "create_hosted_zone",
+            "upsert_record",
+            "delete_record",
+        ],
     ),
     preview_service(
         "transfer",
@@ -777,9 +828,16 @@ const PREVIEW_SERVICE_DESCRIPTORS: &[PreviewServiceDescriptor] = &[
         "networking",
         "Servers, users, workflows, host keys, and identity provider state.",
         "Network, observability, and edge",
-        "unsupported",
-        &["server", "user", "workflow"],
-        &[],
+        "managed",
+        &["server", "user", "workflow", "host-key"],
+        &[
+            "list",
+            "inspect",
+            "create_server",
+            "create_user",
+            "delete_user",
+            "delete_server",
+        ],
     ),
     preview_service(
         "cloudwatchlogs",
@@ -787,9 +845,21 @@ const PREVIEW_SERVICE_DESCRIPTORS: &[PreviewServiceDescriptor] = &[
         "observability",
         "Log groups, log streams, metric filters, and query metadata.",
         "Network, observability, and edge",
-        "unsupported",
-        &["log-group", "log-stream", "query"],
-        &[],
+        "managed",
+        &[
+            "log-group",
+            "log-stream",
+            "log-event",
+            "metric-filter",
+            "subscription-filter",
+        ],
+        &[
+            "list",
+            "inspect",
+            "create_log_group",
+            "tail_recent_events",
+            "delete_log_group",
+        ],
     ),
     preview_service(
         "cloudwatch",
@@ -797,9 +867,15 @@ const PREVIEW_SERVICE_DESCRIPTORS: &[PreviewServiceDescriptor] = &[
         "observability",
         "Metrics, alarms, dashboards, and alarm history.",
         "Network, observability, and edge",
-        "unsupported",
-        &["metric", "alarm", "dashboard"],
-        &[],
+        "managed",
+        &["metric", "alarm", "dashboard", "query-result"],
+        &[
+            "list",
+            "inspect",
+            "query_metric_data",
+            "create_alarm",
+            "delete_alarm",
+        ],
     ),
 ];
 
@@ -2857,6 +2933,508 @@ fn browser_preview_inventory(args: Option<&serde_json::Value>) -> Option<serde_j
                 "export_certificate"
             ]),
         ),
+        "apigateway" => (
+            "API Gateway",
+            "managed",
+            json!([
+                tab(
+                    "rest-apis",
+                    "REST APIs",
+                    ["rest-api"],
+                    "No API Gateway REST APIs were found."
+                ),
+                tab(
+                    "resources",
+                    "Resources",
+                    ["resource"],
+                    "No REST API resources are loaded."
+                ),
+                tab(
+                    "methods",
+                    "Methods",
+                    ["method"],
+                    "No REST API methods are loaded."
+                ),
+                tab(
+                    "integrations",
+                    "Integrations",
+                    ["integration"],
+                    "No REST API integrations are loaded."
+                ),
+                tab(
+                    "deployments",
+                    "Deployments",
+                    ["deployment"],
+                    "No REST API deployments are loaded."
+                ),
+                tab(
+                    "stages",
+                    "Stages",
+                    ["stage"],
+                    "No REST API stages are loaded."
+                )
+            ]),
+            json!([
+                resource(
+                    "rest-api/api-local",
+                    "orders-rest-api",
+                    "rest-api",
+                    "available",
+                    json!({"endpoint": "http://localhost:4566/restapis/api-local/local/_user_request_", "resources": "2"})
+                ),
+                resource(
+                    "resource/api-local/root",
+                    "/",
+                    "resource",
+                    "available",
+                    json!({"api_id": "api-local", "path": "/"})
+                ),
+                resource(
+                    "resource/api-local/orders",
+                    "/orders",
+                    "resource",
+                    "available",
+                    json!({"api_id": "api-local", "path": "/orders"})
+                ),
+                resource(
+                    "method/api-local/orders/GET",
+                    "GET /orders",
+                    "method",
+                    "configured",
+                    json!({"authorization": "NONE", "api_id": "api-local"})
+                ),
+                resource(
+                    "integration/api-local/orders/GET",
+                    "GET /orders integration",
+                    "integration",
+                    "configured",
+                    json!({"type": "HTTP_PROXY", "uri": "http://localhost:3000/orders", "credentials": "redacted"})
+                ),
+                resource(
+                    "deployment/api-local/local",
+                    "local",
+                    "deployment",
+                    "deployed",
+                    json!({"stage": "local"})
+                ),
+                resource(
+                    "stage/api-local/local",
+                    "local",
+                    "stage",
+                    "available",
+                    json!({"deployment_id": "preview"})
+                )
+            ]),
+            json!([]),
+        ),
+        "apigatewayv2" => (
+            "API Gateway v2",
+            "managed",
+            json!([
+                tab(
+                    "apis",
+                    "APIs",
+                    ["api"],
+                    "No API Gateway v2 APIs were found."
+                ),
+                tab(
+                    "routes",
+                    "Routes",
+                    ["route"],
+                    "No API Gateway v2 routes are loaded."
+                ),
+                tab(
+                    "integrations",
+                    "Integrations",
+                    ["integration"],
+                    "No API Gateway v2 integrations are loaded."
+                ),
+                tab(
+                    "deployments",
+                    "Deployments",
+                    ["deployment"],
+                    "No API Gateway v2 deployments are loaded."
+                ),
+                tab(
+                    "stages",
+                    "Stages",
+                    ["stage"],
+                    "No API Gateway v2 stages are loaded."
+                ),
+                tab(
+                    "authorizers",
+                    "Authorizers",
+                    ["authorizer"],
+                    "No API Gateway v2 authorizers are loaded."
+                )
+            ]),
+            json!([
+                resource(
+                    "api/http-api-local",
+                    "orders-http-api",
+                    "api",
+                    "available",
+                    json!({"protocol": "HTTP", "endpoint": "http://localhost:4566/_localstack/apigateway/http-api-local"})
+                ),
+                resource(
+                    "route/http-api-local/GET-orders",
+                    "GET /orders",
+                    "route",
+                    "configured",
+                    json!({"route_key": "GET /orders", "target": "integrations/int-local"})
+                ),
+                resource(
+                    "integration/http-api-local/int-local",
+                    "orders-service",
+                    "integration",
+                    "configured",
+                    json!({"method": "POST", "uri": "http://localhost:3000/orders"})
+                ),
+                resource(
+                    "deployment/http-api-local/dep-local",
+                    "dep-local",
+                    "deployment",
+                    "deployed",
+                    json!({"auto_deployed": "false"})
+                ),
+                resource(
+                    "stage/http-api-local/local",
+                    "local",
+                    "stage",
+                    "available",
+                    json!({"auto_deploy": "true"})
+                ),
+                resource(
+                    "authorizer/http-api-local/auth-local",
+                    "local-jwt",
+                    "authorizer",
+                    "configured",
+                    json!({"identity_sources": "redacted"})
+                )
+            ]),
+            json!([]),
+        ),
+        "elbv2" => (
+            "Elastic Load Balancing v2",
+            "managed",
+            json!([
+                tab(
+                    "load-balancers",
+                    "Load Balancers",
+                    ["load-balancer"],
+                    "No load balancers were found."
+                ),
+                tab(
+                    "listeners",
+                    "Listeners",
+                    ["listener"],
+                    "No listeners are loaded."
+                ),
+                tab(
+                    "rules",
+                    "Rules",
+                    ["listener-rule"],
+                    "No listener rules are loaded."
+                ),
+                tab(
+                    "target-groups",
+                    "Target Groups",
+                    ["target-group"],
+                    "No target groups were found."
+                ),
+                tab(
+                    "targets",
+                    "Targets",
+                    ["target"],
+                    "No target health rows are loaded."
+                )
+            ]),
+            json!([
+                resource(
+                    "load-balancer/app/orders-local/50dc6c495c0c9188",
+                    "orders-local",
+                    "load-balancer",
+                    "active",
+                    json!({"scheme": "internal", "dns_name": "orders-local.localhost.localstack.cloud"})
+                ),
+                resource(
+                    "listener/app/orders-local/80",
+                    "HTTP :80",
+                    "listener",
+                    "active",
+                    json!({"protocol": "HTTP", "port": "80"})
+                ),
+                resource(
+                    "listener-rule/app/orders-local/80/default",
+                    "default",
+                    "listener-rule",
+                    "active",
+                    json!({"priority": "default"})
+                ),
+                resource(
+                    "target-group/orders-targets",
+                    "orders-targets",
+                    "target-group",
+                    "available",
+                    json!({"protocol": "HTTP", "port": "8080", "targets": "1"})
+                ),
+                resource(
+                    "target/orders-targets/i-00000000000000000",
+                    "i-00000000000000000",
+                    "target",
+                    "healthy",
+                    json!({"port": "8080", "target_group": "orders-targets"})
+                )
+            ]),
+            json!([]),
+        ),
+        "route53" => (
+            "Route 53",
+            "managed",
+            json!([
+                tab(
+                    "hosted-zones",
+                    "Hosted Zones",
+                    ["hosted-zone"],
+                    "No hosted zones were found."
+                ),
+                tab(
+                    "records",
+                    "Records",
+                    ["record-set"],
+                    "No record sets are loaded."
+                ),
+                tab(
+                    "health-checks",
+                    "Health Checks",
+                    ["health-check"],
+                    "No health checks are loaded."
+                ),
+                tab(
+                    "changes",
+                    "Changes",
+                    ["change-batch"],
+                    "No change batches are loaded."
+                )
+            ]),
+            json!([
+                resource(
+                    "hosted-zone/ZLOCALFLOCI",
+                    "local.floci.test.",
+                    "hosted-zone",
+                    "available",
+                    json!({"records": "3", "private": "false"})
+                ),
+                resource(
+                    "record-set/ZLOCALFLOCI/api.local.floci.test./A",
+                    "api.local.floci.test.",
+                    "record-set",
+                    "INSYNC",
+                    json!({"type": "A", "ttl": "300", "value": "127.0.0.1"})
+                ),
+                resource(
+                    "health-check/local-api",
+                    "local-api",
+                    "health-check",
+                    "healthy",
+                    json!({"type": "HTTP", "target": "api.local.floci.test."})
+                ),
+                resource(
+                    "change-batch/ZLOCALFLOCI/preview",
+                    "preview change",
+                    "change-batch",
+                    "INSYNC",
+                    json!({"submitted_by": "browser preview"})
+                )
+            ]),
+            json!([]),
+        ),
+        "transfer" => (
+            "Transfer Family",
+            "managed",
+            json!([
+                tab(
+                    "servers",
+                    "Servers",
+                    ["server"],
+                    "No Transfer servers were found."
+                ),
+                tab("users", "Users", ["user"], "No Transfer users are loaded."),
+                tab(
+                    "workflows",
+                    "Workflows",
+                    ["workflow"],
+                    "No workflows are loaded."
+                ),
+                tab(
+                    "host-keys",
+                    "Host Keys",
+                    ["host-key"],
+                    "No host keys are loaded."
+                )
+            ]),
+            json!([
+                resource(
+                    "server/s-1234567890abcdef0",
+                    "s-1234567890abcdef0",
+                    "server",
+                    "ONLINE",
+                    json!({"protocols": "SFTP", "endpoint_type": "PUBLIC"})
+                ),
+                resource(
+                    "user/s-1234567890abcdef0/deploy",
+                    "deploy",
+                    "user",
+                    "available",
+                    json!({"server_id": "s-1234567890abcdef0", "role": "redacted", "home_directory": "redacted"})
+                ),
+                resource(
+                    "workflow/w-1234567890abcdef0",
+                    "post-upload-audit",
+                    "workflow",
+                    "available",
+                    json!({"steps": "1"})
+                ),
+                resource(
+                    "host-key/s-1234567890abcdef0/key-local",
+                    "key-local",
+                    "host-key",
+                    "active",
+                    json!({"fingerprint": "redacted"})
+                )
+            ]),
+            json!([]),
+        ),
+        "cloudwatchlogs" => (
+            "CloudWatch Logs",
+            "managed",
+            json!([
+                tab(
+                    "log-groups",
+                    "Log Groups",
+                    ["log-group"],
+                    "No log groups were found."
+                ),
+                tab(
+                    "streams",
+                    "Streams",
+                    ["log-stream"],
+                    "No log streams are loaded."
+                ),
+                tab(
+                    "events",
+                    "Events",
+                    ["log-event"],
+                    "Run Tail events on a log group to fetch recent events."
+                ),
+                tab(
+                    "filters",
+                    "Filters",
+                    ["metric-filter"],
+                    "No metric filters are loaded."
+                ),
+                tab(
+                    "subscriptions",
+                    "Subscriptions",
+                    ["subscription-filter"],
+                    "No subscription filters are loaded."
+                )
+            ]),
+            json!([
+                resource(
+                    "log-group//aws/lambda/orders-worker",
+                    "/aws/lambda/orders-worker",
+                    "log-group",
+                    "active",
+                    json!({"retention_in_days": "7", "stored_bytes": "4096"})
+                ),
+                resource(
+                    "log-stream//aws/lambda/orders-worker/2026/05/16/[$LATEST]preview",
+                    "2026/05/16/[$LATEST]preview",
+                    "log-stream",
+                    "active",
+                    json!({"log_group": "/aws/lambda/orders-worker", "events": "3"})
+                ),
+                resource(
+                    "log-event//aws/lambda/orders-worker/preview/1",
+                    "redacted event preview",
+                    "log-event",
+                    "available",
+                    json!({"message": "redacted", "timestamp": "preview"})
+                ),
+                resource(
+                    "metric-filter//aws/lambda/orders-worker/errors",
+                    "errors",
+                    "metric-filter",
+                    "active",
+                    json!({"pattern": "ERROR"})
+                ),
+                resource(
+                    "subscription-filter//aws/lambda/orders-worker/audit",
+                    "audit",
+                    "subscription-filter",
+                    "active",
+                    json!({"destination": "arn:aws:lambda:us-east-1:000000000000:function:audit"})
+                )
+            ]),
+            json!([]),
+        ),
+        "cloudwatch" => (
+            "CloudWatch",
+            "managed",
+            json!([
+                tab(
+                    "metrics",
+                    "Metrics",
+                    ["metric"],
+                    "No CloudWatch metrics were found."
+                ),
+                tab("alarms", "Alarms", ["alarm"], "No alarms are loaded."),
+                tab(
+                    "dashboards",
+                    "Dashboards",
+                    ["dashboard"],
+                    "No dashboards are loaded."
+                ),
+                tab(
+                    "query-results",
+                    "Query Results",
+                    ["query-result"],
+                    "Run Query metric on a metric to fetch datapoints."
+                )
+            ]),
+            json!([
+                resource(
+                    "metric/AWS/ApiGateway/Count",
+                    "AWS/ApiGateway Count",
+                    "metric",
+                    "available",
+                    json!({"namespace": "AWS/ApiGateway", "dimensions": "ApiName=orders-http-api"})
+                ),
+                resource(
+                    "alarm/high-latency",
+                    "high-latency",
+                    "alarm",
+                    "OK",
+                    json!({"metric": "Latency", "threshold": "1"})
+                ),
+                resource(
+                    "dashboard/local-network",
+                    "local-network",
+                    "dashboard",
+                    "available",
+                    json!({"widgets": "2"})
+                ),
+                resource(
+                    "query-result/AWS/ApiGateway/Count/latest",
+                    "latest Count datapoints",
+                    "query-result",
+                    "available",
+                    json!({"period": "60", "datapoints": "5"})
+                )
+            ]),
+            json!([]),
+        ),
         _ => return browser_preview_unsupported_inventory(service_key),
     };
 
@@ -2957,6 +3535,14 @@ fn browser_preview_action(args: Option<&serde_json::Value>) -> Option<serde_json
                 .or_else(|| payload.get("environment_name"))
                 .or_else(|| payload.get("profile_name"))
                 .or_else(|| payload.get("environment_id"))
+                .or_else(|| payload.get("api_name"))
+                .or_else(|| payload.get("path_part"))
+                .or_else(|| payload.get("target_group_name"))
+                .or_else(|| payload.get("target_id"))
+                .or_else(|| payload.get("zone_name"))
+                .or_else(|| payload.get("record_name"))
+                .or_else(|| payload.get("log_group_name"))
+                .or_else(|| payload.get("alarm_name"))
         })
         .and_then(|value| value.as_str())
         .map_or_else(|| resource_id.clone(), |value| Some(value.to_owned()));
@@ -3029,6 +3615,31 @@ fn browser_preview_action(args: Option<&serde_json::Value>) -> Option<serde_json
                 | "create_configuration_profile"
                 | "create_hosted_version"
                 | "start_deployment"
+                | "create_rest_api"
+                | "create_resource"
+                | "put_method"
+                | "put_integration"
+                | "delete_rest_api"
+                | "create_api"
+                | "create_route"
+                | "create_integration"
+                | "delete_api"
+                | "create_target_group"
+                | "register_target"
+                | "deregister_target"
+                | "delete_listener"
+                | "delete_load_balancer"
+                | "create_hosted_zone"
+                | "upsert_record"
+                | "delete_record"
+                | "create_server"
+                | "delete_server"
+                | "create_log_group"
+                | "tail_recent_events"
+                | "delete_log_group"
+                | "query_metric_data"
+                | "create_alarm"
+                | "delete_alarm"
         ),
         "message": format!("Preview completed `{action}`. Start the Tauri app to invoke Floci."),
         "resource_id": name.or(resource_id)

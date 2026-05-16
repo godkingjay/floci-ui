@@ -8,7 +8,7 @@ The native Rust side owns Floci connectivity and exposes commands to the UI.
 
 ## Requirements
 
-- Rust 1.85 or newer
+- Rust 1.95 or newer
 - `wasm32-unknown-unknown` Rust target
 - [Trunk](https://trunkrs.dev/)
 - Node.js and npm for Tailwind CSS
@@ -69,13 +69,13 @@ LocalStack localhost aliases such as `localhost.floci.io`,
 ```powershell
 npm run tailwind:build
 npm run build
-cargo fmt --all --check
-cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
-cargo check --target wasm32-unknown-unknown
-cargo check --manifest-path src-tauri/Cargo.toml
-cargo clippy --target wasm32-unknown-unknown --all-features
-cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --all-features
-cargo test --manifest-path src-tauri/Cargo.toml --all-features
+cargo +1.95.0 fmt --all --check
+cargo +1.95.0 fmt --manifest-path src-tauri/Cargo.toml --all --check
+cargo +1.95.0 check --target wasm32-unknown-unknown
+cargo +1.95.0 check --manifest-path src-tauri/Cargo.toml
+cargo +1.95.0 clippy --target wasm32-unknown-unknown --all-features
+cargo +1.95.0 clippy --manifest-path src-tauri/Cargo.toml --all-targets --all-features
+cargo +1.95.0 test --manifest-path src-tauri/Cargo.toml --all-features
 ```
 
 ## Native Commands

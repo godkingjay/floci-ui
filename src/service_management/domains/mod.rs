@@ -1,6 +1,7 @@
 pub mod compute_build;
 pub mod data_storage;
 pub mod messaging_events;
+pub mod network_observability;
 pub mod security_config;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -38,6 +39,7 @@ pub fn definition(service_key: &str) -> Option<&'static ServiceDomainDefinition>
         .or_else(|| messaging_events::definition(service_key))
         .or_else(|| compute_build::definition(service_key))
         .or_else(|| security_config::definition(service_key))
+        .or_else(|| network_observability::definition(service_key))
 }
 
 pub fn is_domain_service(service_key: &str) -> bool {

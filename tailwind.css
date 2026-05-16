@@ -1702,6 +1702,21 @@ textarea:focus-visible {
 .resource-table th:nth-child(6),
 .resource-table td:nth-child(6) {
   width: 150px;
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: var(--color-surface);
+  box-shadow: -1px 0 0 var(--color-border-subtle);
+}
+
+.resource-table th:nth-child(6) {
+  z-index: 2;
+  background: var(--color-surface-muted);
+}
+
+.resource-table tbody tr:hover td:nth-child(6),
+.resource-table tbody tr:focus-visible td:nth-child(6) {
+  background: var(--color-surface-muted);
 }
 
 .resource-table th {

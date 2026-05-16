@@ -3,7 +3,9 @@ use time::{OffsetDateTime, format_description::well_known::Rfc3339};
 use crate::{
     config::AppConfig,
     service_management::{
-        adapters::{compute_build, data_storage, messaging_events, security_config},
+        adapters::{
+            compute_build, data_storage, messaging_events, network_observability, security_config,
+        },
         errors::ServiceManagementError,
         models::{
             ActionResult, ResourceDetail, ResourceDetailRequest, ServiceActionRequest,
@@ -32,6 +34,10 @@ pub async fn list_resources(
 
     if security_config::SERVICE_KEYS.contains(&service_key.as_str()) {
         return security_config::list_resources(config, &service_key).await;
+    }
+
+    if network_observability::SERVICE_KEYS.contains(&service_key.as_str()) {
+        return network_observability::list_resources(config, &service_key).await;
     }
 
     crate::service_management::registry::unsupported_inventory(&service_key)
@@ -77,6 +83,15 @@ pub async fn get_resource_detail(
         };
 
         return security_config::get_resource_detail(config, &request).await;
+    }
+
+    if network_observability::SERVICE_KEYS.contains(&service_key.as_str()) {
+        let request = ResourceDetailRequest {
+            service_key,
+            resource_id: request.resource_id.clone(),
+        };
+
+        return network_observability::get_resource_detail(config, &request).await;
     }
 
     if crate::service_management::registry::descriptor(&service_key).is_some() {
@@ -155,6 +170,19 @@ pub async fn execute_action(
         };
 
         return security_config::execute_action(config, &request).await;
+    }
+
+    if network_observability::SERVICE_KEYS.contains(&service_key.as_str()) {
+        let request = ServiceActionRequest {
+            service_key,
+            action: action.to_owned(),
+            resource_id: request.resource_id.clone(),
+            resource_name: request.resource_name.clone(),
+            confirmation: request.confirmation.clone(),
+            payload: request.payload.clone(),
+        };
+
+        return network_observability::execute_action(config, &request).await;
     }
 
     if crate::service_management::registry::descriptor(&service_key).is_some() {
@@ -265,9 +293,7 @@ mod tests {
 
     use crate::{
         config::AppConfig,
-        service_management::models::{
-            ResourceDetailRequest, ServiceActionRequest, ServiceSupportLevel,
-        },
+        service_management::models::{ResourceDetailRequest, ServiceActionRequest},
     };
 
     use super::{
@@ -319,34 +345,20 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn returns_unsupported_inventory_for_known_service_without_adapter() {
-        let config = test_config();
-
-        let inventory = list_resources(&config, "apigateway")
-            .await
-            .expect("known security service should route to its adapter");
-
-        assert_eq!(inventory.service_key, "apigateway");
-        assert_eq!(inventory.support_level, ServiceSupportLevel::Unsupported);
-        assert!(inventory.resources.is_empty());
-        assert!(!inventory.tabs.is_empty());
-    }
-
-    #[tokio::test]
-    async fn returns_unsupported_operation_for_known_service_without_adapter() {
+    async fn returns_unsupported_operation_for_known_managed_service() {
         let config = test_config();
         let request = ServiceActionRequest {
-            service_key: "apigateway".to_owned(),
+            service_key: "cloudwatchlogs".to_owned(),
             action: "create_function".to_owned(),
-            resource_id: None,
-            resource_name: None,
+            resource_id: Some("log-group/example".to_owned()),
+            resource_name: Some("example".to_owned()),
             confirmation: None,
             payload: json!({}),
         };
 
         let error = execute_action(&config, &request)
             .await
-            .expect_err("known service should reject unsupported operation");
+            .expect_err("known managed service should reject unsupported operation");
 
         assert_eq!(error.code, "unsupported_operation");
     }

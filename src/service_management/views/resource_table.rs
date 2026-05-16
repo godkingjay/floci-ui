@@ -3,10 +3,11 @@
 use std::rc::Rc;
 
 use icondata::{
-    Icon as IconData, LuAlertTriangle, LuArchive, LuArrowUpDown, LuBox, LuCalendar, LuCheckCircle2,
-    LuChevronDown, LuChevronUp, LuCircleDot, LuDatabase, LuEye, LuFileJson, LuFolder, LuGlobe,
-    LuHardDrive, LuKeyRound, LuLink2, LuPackage, LuPackageSearch, LuRefreshCw, LuServer,
-    LuShieldCheck, LuTable2, LuTags,
+    Icon as IconData, LuActivity, LuAlertTriangle, LuArchive, LuArrowUpDown, LuBox, LuCable,
+    LuCalendar, LuCheckCircle2, LuChevronDown, LuChevronUp, LuCircleDot, LuCloudCog, LuDatabase,
+    LuEye, LuFileJson, LuFolder, LuGlobe, LuHardDrive, LuKeyRound, LuLayoutDashboard, LuLink2,
+    LuMapPin, LuPackage, LuPackageSearch, LuRefreshCw, LuServer, LuShieldCheck, LuTable2, LuTags,
+    LuWifi,
 };
 use leptos::{ev::KeyboardEvent, ev::MouseEvent, *};
 use leptos_icons::Icon;
@@ -309,12 +310,16 @@ fn resource_kind_icon(kind: &str) -> IconData {
         "access-key" => LuKeyRound,
         "alias" => LuLink2,
         "addon" => LuPackage,
+        "alarm" => LuAlertTriangle,
         "application" | "project" => LuPackageSearch,
+        "api" | "rest-api" => LuWifi,
         "auto-scaling-group" | "scaling-instance" => LuServer,
+        "authorizer" => LuShieldCheck,
         "broker" | "container-instance" | "instance" | "node-group" => LuServer,
         "build" | "deployment" | "invocation" | "report" => LuRefreshCw,
         "bucket" => LuPackage,
         "cache-cluster" | "replication-group" => LuServer,
+        "change-batch" => LuRefreshCw,
         "change-set" => LuArchive,
         "configuration"
         | "configuration-preview"
@@ -328,24 +333,33 @@ fn resource_kind_icon(kind: &str) -> IconData {
         "dead-letter-queue" => LuArchive,
         "definition" => LuFileJson,
         "deployment-group" => LuLink2,
-        "domain" | "event-bus" | "rule" | "topic" => LuGlobe,
+        "domain" | "event-bus" | "hosted-zone" | "rule" | "topic" => LuGlobe,
+        "dashboard" => LuLayoutDashboard,
         "file-system" => LuFolder,
         "function" | "group" | "role" | "task" | "task-definition" | "user" | "user-pool" => {
             LuPackage
         }
+        "health-check" => LuActivity,
+        "host-key" => LuKeyRound,
         "image" | "repository" => LuArchive,
+        "integration" | "listener" | "listener-rule" | "method" | "route" => LuCable,
         "key" | "key-pair" | "key-policy" => LuKeyRound,
         "lifecycle-hook" | "scaling-policy" => LuLink2,
-        "model" => LuDatabase,
+        "load-balancer" | "server" | "target-group" => LuServer,
+        "log-event" | "log-group" | "log-stream" => LuFileJson,
+        "metric-filter" | "subscription-filter" => LuTags,
+        "model" | "query-result" => LuDatabase,
         "metric" | "send-statistic" => LuTable2,
         "managed-instance" | "message" | "queue" => LuPackage,
         "parameter" | "policy" | "queue-attribute" => LuTags,
         "replay" => LuRefreshCw,
+        "record-set" => LuMapPin,
         "schedule" | "schedule-group" => LuCalendar,
         "secret" | "secret-version" => LuShieldCheck,
         "security-group" | "subnet" | "vpc" => LuGlobe,
         "snapshot" => LuArchive,
         "stack" | "stack-event" | "stack-resource" | "state-machine" | "stream" => LuServer,
+        "stage" => LuCloudCog,
         "table" | "tag" | "template" | "version" | "hosted-version" => LuTable2,
         "app-client" | "identity-provider" | "instance-profile" => LuLink2,
         "validation" => LuCheckCircle2,

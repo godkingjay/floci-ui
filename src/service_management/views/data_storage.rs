@@ -678,7 +678,7 @@ fn render_resource_action_dialog(
         return view! { <></> }.into_view();
     }
 
-    let config = action_form_config(action);
+    let config = action_form_config(&service_key, action);
     let resource_name = resource.name.clone();
     let selected_resource = resource.clone();
     let footer_resource = resource.clone();
@@ -896,7 +896,9 @@ fn dispatch_action(
         return;
     }
 
-    if let Some(message) = validate_action_inputs(action, &primary, &secondary, &payload_text) {
+    if let Some(message) =
+        validate_action_inputs(&service_key, action, &primary, &secondary, &payload_text)
+    {
         set_action_error.set(Some(message));
         return;
     }
@@ -1099,6 +1101,77 @@ fn action_payload(
                 "deployment_strategy_id": secondary.trim(),
             })
         }
+        ("apigateway", "create_rest_api") => json!({ "api_name": primary.trim() }),
+        ("apigateway", "create_resource") => json!({ "path_part": primary.trim() }),
+        ("apigateway", "put_method") => json!({ "http_method": primary.trim() }),
+        ("apigateway", "put_integration") => {
+            json!({
+                "integration_uri": primary.trim(),
+                "integration_method": secondary.trim(),
+            })
+        }
+        ("apigateway", "create_deployment") => json!({ "stage_name": primary.trim() }),
+        ("apigatewayv2", "create_api") => {
+            json!({
+                "api_name": primary.trim(),
+                "protocol_type": secondary.trim(),
+            })
+        }
+        ("apigatewayv2", "create_route") => {
+            json!({
+                "route_key": primary.trim(),
+                "target": secondary.trim(),
+            })
+        }
+        ("apigatewayv2", "create_integration") => {
+            json!({
+                "integration_uri": primary.trim(),
+                "integration_method": secondary.trim(),
+            })
+        }
+        ("apigatewayv2", "create_deployment") => json!({}),
+        ("elbv2", "create_target_group") => {
+            json!({
+                "target_group_name": primary.trim(),
+                "vpc_id": secondary.trim(),
+            })
+        }
+        ("elbv2", "register_target") => {
+            json!({
+                "target_id": primary.trim(),
+                "port": secondary.trim(),
+            })
+        }
+        ("route53", "create_hosted_zone") => json!({ "zone_name": primary.trim() }),
+        ("route53", "upsert_record") => {
+            json!({
+                "record_name": primary.trim(),
+                "record_type": secondary.trim(),
+                "record_value": payload_text.trim(),
+            })
+        }
+        ("transfer", "create_server") => json!({ "protocol": primary.trim() }),
+        ("transfer", "create_user") => {
+            json!({
+                "user_name": primary.trim(),
+                "role_arn": secondary.trim(),
+                "home_directory": payload_text.trim(),
+            })
+        }
+        ("cloudwatchlogs", "create_log_group") => json!({ "log_group_name": primary.trim() }),
+        ("cloudwatchlogs", "tail_recent_events") => json!({ "limit": primary.trim() }),
+        ("cloudwatch", "query_metric_data") => {
+            json!({
+                "period": primary.trim(),
+                "window_seconds": secondary.trim(),
+            })
+        }
+        ("cloudwatch", "create_alarm") => {
+            json!({
+                "alarm_name": primary.trim(),
+                "threshold": secondary.trim(),
+            })
+        }
         _ => json!({}),
     }
 }
@@ -1114,9 +1187,9 @@ struct ActionFormConfig {
     submit_label: &'static str,
 }
 
-fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
-    match action.key {
-        "subscribe_endpoint" => ActionFormConfig {
+fn action_form_config(service_key: &str, action: ServiceActionDefinition) -> ActionFormConfig {
+    match (service_key, action.key) {
+        (_, "subscribe_endpoint") => ActionFormConfig {
             primary_label: Some("Protocol"),
             primary_placeholder: "sqs",
             secondary_label: Some("Endpoint"),
@@ -1125,7 +1198,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: "",
             submit_label: "Subscribe",
         },
-        "put_record" => ActionFormConfig {
+        (_, "put_record") => ActionFormConfig {
             primary_label: Some("Partition key"),
             primary_placeholder: "order-123",
             secondary_label: None,
@@ -1134,7 +1207,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: r#"{"event":"order.created"}"#,
             submit_label: "Put record",
         },
-        "create_rule" => ActionFormConfig {
+        (_, "create_rule") => ActionFormConfig {
             primary_label: Some("Rule name"),
             primary_placeholder: "order-created",
             secondary_label: None,
@@ -1143,7 +1216,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: r#"{"source":["floci.ui"]}"#,
             submit_label: "Create rule",
         },
-        "put_event" => ActionFormConfig {
+        (_, "put_event") => ActionFormConfig {
             primary_label: Some("Source"),
             primary_placeholder: "floci.ui",
             secondary_label: Some("Detail type"),
@@ -1152,7 +1225,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: r#"{"status":"ok"}"#,
             submit_label: "Put event",
         },
-        "start_execution" => ActionFormConfig {
+        (_, "start_execution") => ActionFormConfig {
             primary_label: Some("Execution name"),
             primary_placeholder: "manual-test",
             secondary_label: None,
@@ -1161,7 +1234,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: "{}",
             submit_label: "Start execution",
         },
-        "invoke_function" => ActionFormConfig {
+        (_, "invoke_function") => ActionFormConfig {
             primary_label: None,
             primary_placeholder: "",
             secondary_label: None,
@@ -1170,7 +1243,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: r#"{"message":"hello from floci-ui"}"#,
             submit_label: "Invoke",
         },
-        "run_task" => ActionFormConfig {
+        (_, "run_task") => ActionFormConfig {
             primary_label: Some("Task definition"),
             primary_placeholder: "orders-worker:1",
             secondary_label: None,
@@ -1179,7 +1252,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: "",
             submit_label: "Run task",
         },
-        "update_service_desired_count" => ActionFormConfig {
+        (_, "update_service_desired_count") => ActionFormConfig {
             primary_label: Some("Desired count"),
             primary_placeholder: "2",
             secondary_label: Some("Cluster ARN"),
@@ -1188,7 +1261,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: "",
             submit_label: "Update service",
         },
-        "start_build" => ActionFormConfig {
+        (_, "start_build") => ActionFormConfig {
             primary_label: Some("Source version"),
             primary_placeholder: "main",
             secondary_label: None,
@@ -1197,7 +1270,25 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: "",
             submit_label: "Start build",
         },
-        "create_deployment" => ActionFormConfig {
+        ("apigateway", "create_deployment") => ActionFormConfig {
+            primary_label: Some("Stage name"),
+            primary_placeholder: "local",
+            secondary_label: None,
+            secondary_placeholder: "",
+            payload_label: None,
+            payload_placeholder: "",
+            submit_label: "Create deployment",
+        },
+        ("apigatewayv2", "create_deployment") => ActionFormConfig {
+            primary_label: None,
+            primary_placeholder: "",
+            secondary_label: None,
+            secondary_placeholder: "",
+            payload_label: None,
+            payload_placeholder: "",
+            submit_label: "Create deployment",
+        },
+        (_, "create_deployment") => ActionFormConfig {
             primary_label: None,
             primary_placeholder: "",
             secondary_label: None,
@@ -1206,7 +1297,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: "floci-ui local deployment",
             submit_label: "Create deployment",
         },
-        "update_desired_capacity" => ActionFormConfig {
+        (_, "update_desired_capacity") => ActionFormConfig {
             primary_label: Some("Desired capacity"),
             primary_placeholder: "2",
             secondary_label: None,
@@ -1215,7 +1306,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: "",
             submit_label: "Update capacity",
         },
-        "invoke_model" => ActionFormConfig {
+        (_, "invoke_model") => ActionFormConfig {
             primary_label: Some("Model ID override"),
             primary_placeholder: "local-bedrock-runtime",
             secondary_label: None,
@@ -1224,7 +1315,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: r#"{"prompt":"hello from floci-ui"}"#,
             submit_label: "Invoke model",
         },
-        "validate_request_template" => ActionFormConfig {
+        (_, "validate_request_template") => ActionFormConfig {
             primary_label: None,
             primary_placeholder: "",
             secondary_label: None,
@@ -1233,7 +1324,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: r#"{"prompt":"hello from floci-ui"}"#,
             submit_label: "Validate",
         },
-        "send_message" => ActionFormConfig {
+        (_, "send_message") => ActionFormConfig {
             primary_label: None,
             primary_placeholder: "",
             secondary_label: None,
@@ -1242,7 +1333,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: r#"{"message":"hello from floci-ui"}"#,
             submit_label: "Send message",
         },
-        "publish_message" => ActionFormConfig {
+        (_, "publish_message") => ActionFormConfig {
             primary_label: None,
             primary_placeholder: "",
             secondary_label: None,
@@ -1251,7 +1342,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: r#"{"message":"hello subscribers"}"#,
             submit_label: "Publish",
         },
-        "create_access_key" => ActionFormConfig {
+        (_, "create_access_key") => ActionFormConfig {
             primary_label: None,
             primary_placeholder: "",
             secondary_label: None,
@@ -1260,7 +1351,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: "",
             submit_label: "Create key",
         },
-        "create_user_pool_client" => ActionFormConfig {
+        (_, "create_user_pool_client") => ActionFormConfig {
             primary_label: Some("Client name"),
             primary_placeholder: "floci-local-client",
             secondary_label: None,
@@ -1269,7 +1360,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: "",
             submit_label: "Create client",
         },
-        "create_alias" => ActionFormConfig {
+        (_, "create_alias") => ActionFormConfig {
             primary_label: Some("Alias name"),
             primary_placeholder: "alias/floci-local",
             secondary_label: None,
@@ -1278,7 +1369,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: "",
             submit_label: "Create alias",
         },
-        "reveal_secret_value" | "reveal_parameter_value" => ActionFormConfig {
+        (_, "reveal_secret_value" | "reveal_parameter_value") => ActionFormConfig {
             primary_label: None,
             primary_placeholder: "",
             secondary_label: None,
@@ -1287,7 +1378,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: "",
             submit_label: "Reveal summary",
         },
-        "create_environment" => ActionFormConfig {
+        (_, "create_environment") => ActionFormConfig {
             primary_label: Some("Environment name"),
             primary_placeholder: "local",
             secondary_label: None,
@@ -1296,7 +1387,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: "",
             submit_label: "Create environment",
         },
-        "create_configuration_profile" => ActionFormConfig {
+        (_, "create_configuration_profile") => ActionFormConfig {
             primary_label: Some("Profile name"),
             primary_placeholder: "runtime-config",
             secondary_label: Some("Location URI"),
@@ -1305,7 +1396,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: "",
             submit_label: "Create profile",
         },
-        "create_hosted_version" => ActionFormConfig {
+        (_, "create_hosted_version") => ActionFormConfig {
             primary_label: None,
             primary_placeholder: "",
             secondary_label: Some("Content type"),
@@ -1314,7 +1405,7 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_placeholder: "{}",
             submit_label: "Create version",
         },
-        "start_deployment" => ActionFormConfig {
+        (_, "start_deployment") => ActionFormConfig {
             primary_label: Some("Environment ID"),
             primary_placeholder: "local",
             secondary_label: Some("Deployment strategy ID"),
@@ -1322,6 +1413,105 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
             payload_label: None,
             payload_placeholder: "",
             submit_label: "Start deployment",
+        },
+        ("apigateway", "create_resource") => ActionFormConfig {
+            primary_label: Some("Path part"),
+            primary_placeholder: "orders",
+            secondary_label: None,
+            secondary_placeholder: "",
+            payload_label: None,
+            payload_placeholder: "",
+            submit_label: "Create resource",
+        },
+        ("apigateway", "put_method") => ActionFormConfig {
+            primary_label: Some("HTTP method"),
+            primary_placeholder: "GET",
+            secondary_label: None,
+            secondary_placeholder: "",
+            payload_label: None,
+            payload_placeholder: "",
+            submit_label: "Put method",
+        },
+        ("apigateway", "put_integration") => ActionFormConfig {
+            primary_label: Some("Integration URI"),
+            primary_placeholder: "http://localhost:3000/orders",
+            secondary_label: Some("Integration method"),
+            secondary_placeholder: "POST",
+            payload_label: None,
+            payload_placeholder: "",
+            submit_label: "Put integration",
+        },
+        ("apigatewayv2", "create_route") => ActionFormConfig {
+            primary_label: Some("Route key"),
+            primary_placeholder: "GET /orders",
+            secondary_label: Some("Target"),
+            secondary_placeholder: "integrations/{integrationId}",
+            payload_label: None,
+            payload_placeholder: "",
+            submit_label: "Create route",
+        },
+        ("apigatewayv2", "create_integration") => ActionFormConfig {
+            primary_label: Some("Integration URI"),
+            primary_placeholder: "http://localhost:3000/orders",
+            secondary_label: Some("Integration method"),
+            secondary_placeholder: "POST",
+            payload_label: None,
+            payload_placeholder: "",
+            submit_label: "Create integration",
+        },
+        ("elbv2", "register_target") => ActionFormConfig {
+            primary_label: Some("Target ID"),
+            primary_placeholder: "i-00000000000000000",
+            secondary_label: Some("Port"),
+            secondary_placeholder: "80",
+            payload_label: None,
+            payload_placeholder: "",
+            submit_label: "Register target",
+        },
+        ("route53", "upsert_record") => ActionFormConfig {
+            primary_label: Some("Record name"),
+            primary_placeholder: "api.local.floci.test.",
+            secondary_label: Some("Record type"),
+            secondary_placeholder: "A",
+            payload_label: Some("Record value"),
+            payload_placeholder: "127.0.0.1",
+            submit_label: "Upsert record",
+        },
+        ("transfer", "create_user") => ActionFormConfig {
+            primary_label: Some("User name"),
+            primary_placeholder: "deploy",
+            secondary_label: Some("Role ARN"),
+            secondary_placeholder: "arn:aws:iam::000000000000:role/floci-transfer-local",
+            payload_label: Some("Home directory"),
+            payload_placeholder: "/home/deploy",
+            submit_label: "Create user",
+        },
+        ("cloudwatchlogs", "tail_recent_events") => ActionFormConfig {
+            primary_label: Some("Limit"),
+            primary_placeholder: "20",
+            secondary_label: None,
+            secondary_placeholder: "",
+            payload_label: None,
+            payload_placeholder: "",
+            submit_label: "Tail events",
+        },
+        ("cloudwatch", "query_metric_data") => ActionFormConfig {
+            primary_label: Some("Period seconds"),
+            primary_placeholder: "60",
+            secondary_label: Some("Window seconds"),
+            secondary_placeholder: "3600",
+            payload_label: None,
+            payload_placeholder: "",
+            submit_label: "Query metric",
+        },
+        ("cloudwatch", "create_alarm") => ActionFormConfig {
+            primary_label: Some("Alarm name"),
+            primary_placeholder: "high-latency",
+            secondary_label: Some("Threshold"),
+            secondary_placeholder: "1",
+            payload_label: None,
+            payload_placeholder: "",
+            submit_label: "Create alarm",
         },
         _ => ActionFormConfig {
             primary_label: None,
@@ -1336,17 +1526,18 @@ fn action_form_config(action: ServiceActionDefinition) -> ActionFormConfig {
 }
 
 fn validate_action_inputs(
+    service_key: &str,
     action: ServiceActionDefinition,
     primary: &str,
     secondary: &str,
     payload_text: &str,
 ) -> Option<String> {
-    match action.key {
-        "send_message" | "publish_message" => payload_text
+    match (service_key, action.key) {
+        (_, "send_message" | "publish_message") => payload_text
             .trim()
             .is_empty()
             .then(|| "A message body is required before this local action can run.".to_owned()),
-        "put_record" => {
+        (_, "put_record") => {
             if primary.trim().is_empty() {
                 return Some("A partition key is required.".to_owned());
             }
@@ -1355,7 +1546,7 @@ fn validate_action_inputs(
                 .is_empty()
                 .then(|| "Record data is required.".to_owned())
         }
-        "subscribe_endpoint" => {
+        (_, "subscribe_endpoint") => {
             if primary.trim().is_empty() {
                 return Some("A subscription protocol is required.".to_owned());
             }
@@ -1364,7 +1555,7 @@ fn validate_action_inputs(
                 .is_empty()
                 .then(|| "A subscription endpoint is required.".to_owned())
         }
-        "create_rule" => {
+        (_, "create_rule") => {
             if primary.trim().is_empty() {
                 return Some("A rule name is required.".to_owned());
             }
@@ -1373,7 +1564,7 @@ fn validate_action_inputs(
             }
             validate_json_payload(payload_text, "Event pattern JSON")
         }
-        "put_event" => {
+        (_, "put_event") => {
             if primary.trim().is_empty() {
                 return Some("An event source is required.".to_owned());
             }
@@ -1385,29 +1576,29 @@ fn validate_action_inputs(
             }
             validate_json_payload(payload_text, "Detail JSON")
         }
-        "create_state_machine" => {
+        (_, "create_state_machine") => {
             if payload_text.trim().is_empty() {
                 return None;
             }
             validate_json_payload(payload_text, "Definition JSON")
         }
-        "start_execution" => {
+        (_, "start_execution") => {
             if payload_text.trim().is_empty() {
                 return None;
             }
             validate_json_payload(payload_text, "Input JSON")
         }
-        "invoke_function" => {
+        (_, "invoke_function") => {
             if payload_text.trim().is_empty() {
                 return Some("A JSON payload is required.".to_owned());
             }
             validate_json_payload(payload_text, "Payload JSON")
         }
-        "run_task" => primary
+        (_, "run_task") => primary
             .trim()
             .is_empty()
             .then(|| "A task definition is required.".to_owned()),
-        "update_service_desired_count" => {
+        (_, "update_service_desired_count") => {
             if primary.trim().parse::<i32>().is_err() {
                 return Some("Desired count must be a number.".to_owned());
             }
@@ -1416,57 +1607,124 @@ fn validate_action_inputs(
                 .is_empty()
                 .then(|| "A cluster ARN is required.".to_owned())
         }
-        "update_desired_capacity" => primary
+        (_, "update_desired_capacity") => primary
             .trim()
             .parse::<i32>()
             .is_err()
             .then(|| "Desired capacity must be a number.".to_owned()),
-        "invoke_model" | "validate_request_template" => {
+        (_, "invoke_model" | "validate_request_template") => {
             if payload_text.trim().is_empty() {
                 return Some("A request JSON payload is required.".to_owned());
             }
             validate_json_payload(payload_text, "Request JSON")
         }
-        "create_stack" => {
+        (_, "create_stack") => {
             if payload_text.trim().is_empty() {
                 return None;
             }
             validate_json_payload(payload_text, "Template body JSON")
         }
-        "create_role" => {
+        (_, "create_role") => {
             if payload_text.trim().is_empty() {
                 return None;
             }
             validate_json_payload(payload_text, "Assume role policy JSON")
         }
-        "create_policy" => {
+        (_, "create_policy") => {
             if payload_text.trim().is_empty() {
                 return None;
             }
             validate_json_payload(payload_text, "Policy document JSON")
         }
-        "create_alias" => primary
+        (_, "create_alias") => primary
             .trim()
             .starts_with("alias/")
             .then_some(())
             .is_none()
             .then(|| "Alias name must start with `alias/`.".to_owned()),
-        "create_user_pool_client" | "create_environment" | "create_configuration_profile" => {
+        (_, "create_user_pool_client" | "create_environment" | "create_configuration_profile") => {
             primary
                 .trim()
                 .is_empty()
                 .then(|| "A name is required.".to_owned())
         }
-        "create_hosted_version" => {
+        (_, "create_hosted_version") => {
             if payload_text.trim().is_empty() {
                 return Some("Configuration JSON is required.".to_owned());
             }
             validate_json_payload(payload_text, "Configuration JSON")
         }
-        "start_deployment" => primary
+        (_, "start_deployment") => primary
             .trim()
             .is_empty()
             .then(|| "An environment ID is required.".to_owned()),
+        ("elbv2", "create_target_group") => secondary
+            .trim()
+            .is_empty()
+            .then(|| "A VPC ID is required.".to_owned()),
+        ("apigateway", "create_resource") => primary
+            .trim()
+            .is_empty()
+            .then(|| "A path part is required.".to_owned()),
+        ("apigateway", "put_integration") | ("apigatewayv2", "create_integration") => primary
+            .trim()
+            .is_empty()
+            .then(|| "An integration URI is required.".to_owned()),
+        ("apigatewayv2", "create_route") => primary
+            .trim()
+            .is_empty()
+            .then(|| "A route key is required.".to_owned()),
+        ("elbv2", "register_target") => {
+            if primary.trim().is_empty() {
+                return Some("A target ID is required.".to_owned());
+            }
+            if !secondary.trim().is_empty() && secondary.trim().parse::<i32>().is_err() {
+                return Some("Target port must be a number.".to_owned());
+            }
+            None
+        }
+        ("route53", "upsert_record") => {
+            if primary.trim().is_empty() {
+                return Some("A record name is required.".to_owned());
+            }
+            payload_text
+                .trim()
+                .is_empty()
+                .then(|| "A record value is required.".to_owned())
+        }
+        ("transfer", "create_user") => {
+            if primary.trim().is_empty() {
+                return Some("A user name is required.".to_owned());
+            }
+            secondary
+                .trim()
+                .is_empty()
+                .then(|| "A role ARN is required.".to_owned())
+        }
+        ("cloudwatchlogs", "tail_recent_events") => {
+            if !primary.trim().is_empty() && primary.trim().parse::<i32>().is_err() {
+                return Some("Event limit must be a number.".to_owned());
+            }
+            None
+        }
+        ("cloudwatch", "query_metric_data") => {
+            if !primary.trim().is_empty() && primary.trim().parse::<i32>().is_err() {
+                return Some("Period seconds must be a number.".to_owned());
+            }
+            if !secondary.trim().is_empty() && secondary.trim().parse::<i32>().is_err() {
+                return Some("Window seconds must be a number.".to_owned());
+            }
+            None
+        }
+        ("cloudwatch", "create_alarm") => {
+            if primary.trim().is_empty() {
+                return Some("An alarm name is required.".to_owned());
+            }
+            if secondary.trim().parse::<f64>().is_err() {
+                return Some("Alarm threshold must be a number.".to_owned());
+            }
+            None
+        }
         _ => None,
     }
 }
