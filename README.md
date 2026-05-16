@@ -1,9 +1,5 @@
 # Floci UI
 
-<p align="center">
-  <img src="assets/floci-ui-app-icon.png" alt="Floci UI app icon" width="96" height="96" />
-</p>
-
 ![Floci UI banner](assets/floci-ui-readme-banner.svg)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
