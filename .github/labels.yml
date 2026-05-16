@@ -1,0 +1,42 @@
+- name: bug
+  color: d73a4a
+  description: Something is not working.
+- name: enhancement
+  color: a2eeef
+  description: New feature or request.
+- name: documentation
+  color: 0075ca
+  description: Documentation-only changes.
+- name: dependencies
+  color: 0366d6
+  description: Dependency updates.
+- name: rust
+  color: dea584
+  description: Rust code or Cargo dependency changes.
+- name: npm
+  color: cb3837
+  description: npm package or frontend tooling changes.
+- name: github-actions
+  color: 2088ff
+  description: GitHub Actions workflow changes.
+- name: security
+  color: ee0701
+  description: Security policy, advisory, or vulnerability handling.
+- name: good first issue
+  color: 7057ff
+  description: A scoped issue suitable for new contributors.
+- name: needs-triage
+  color: ffbf00
+  description: Maintainers need to classify priority and scope.
+- name: help wanted
+  color: 008672
+  description: Maintainers welcome community help.
+- name: tauri
+  color: 24c8db
+  description: Tauri desktop shell and native integration.
+- name: frontend
+  color: 1d76db
+  description: Leptos frontend and UI behavior.
+- name: backend
+  color: 5319e7
+  description: Native backend, commands, and service adapters.

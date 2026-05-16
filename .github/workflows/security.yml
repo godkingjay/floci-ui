@@ -1,0 +1,82 @@
+name: Security
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  schedule:
+    - cron: "21 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    env:
+      CARGO_INCREMENTAL: "0"
+      CARGO_TERM_COLOR: always
+      CARGO_AUDIT_IGNORES: >-
+        --ignore RUSTSEC-2024-0370
+        --ignore RUSTSEC-2024-0411
+        --ignore RUSTSEC-2024-0412
+        --ignore RUSTSEC-2024-0413
+        --ignore RUSTSEC-2024-0414
+        --ignore RUSTSEC-2024-0415
+        --ignore RUSTSEC-2024-0416
+        --ignore RUSTSEC-2024-0417
+        --ignore RUSTSEC-2024-0418
+        --ignore RUSTSEC-2024-0419
+        --ignore RUSTSEC-2024-0420
+        --ignore RUSTSEC-2024-0429
+        --ignore RUSTSEC-2024-0436
+        --ignore RUSTSEC-2025-0052
+        --ignore RUSTSEC-2025-0075
+        --ignore RUSTSEC-2025-0080
+        --ignore RUSTSEC-2025-0081
+        --ignore RUSTSEC-2025-0098
+        --ignore RUSTSEC-2025-0100
+        --ignore RUSTSEC-2026-0098
+        --ignore RUSTSEC-2026-0099
+        --ignore RUSTSEC-2026-0104
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust 1.95
+        uses: dtolnay/rust-toolchain@1.95.0
+
+      - name: Install Rust security tools
+        run: |
+          cargo install cargo-audit --locked
+          cargo install cargo-deny --locked
+
+      - name: Rust dependency policy
+        run: |
+          cargo deny check advisories bans licenses sources
+          cargo deny --manifest-path src-tauri/Cargo.toml check advisories bans licenses sources
+
+      - name: Rust advisories
+        run: |
+          cargo audit --file Cargo.lock $CARGO_AUDIT_IGNORES
+          cargo audit --file src-tauri/Cargo.lock $CARGO_AUDIT_IGNORES
+
+      - name: npm audit
+        run: npm audit --audit-level=high
+
+      - name: Secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

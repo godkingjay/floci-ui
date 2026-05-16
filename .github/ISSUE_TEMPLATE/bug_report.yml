@@ -1,0 +1,84 @@
+name: Bug report
+description: Report a reproducible problem in Floci UI.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Please avoid posting secrets, tokens, credentials, or private endpoint data.
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      description: Include OS name and version.
+      placeholder: Windows 11, Ubuntu 24.04, macOS 15
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: Floci UI version
+      placeholder: v0.1.0 or commit SHA
+    validations:
+      required: true
+  - type: input
+    id: rust-version
+    attributes:
+      label: Rust version
+      placeholder: rustc 1.95.0
+    validations:
+      required: false
+  - type: input
+    id: floci-version
+    attributes:
+      label: Floci emulator version
+      placeholder: image tag, release, or commit SHA
+    validations:
+      required: true
+  - type: input
+    id: endpoint-shape
+    attributes:
+      label: Endpoint URL shape
+      description: Share the scheme and host shape only. Do not include credentials.
+      placeholder: http://127.0.0.1:4566
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start Floci with ...
+        2. Open Floci UI and navigate to ...
+        3. Click ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Paste relevant sanitized logs. Remove credentials and private data.
+      render: text
+    validations:
+      required: false
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Drag screenshots here if they help explain the issue.
+    validations:
+      required: false
