@@ -9,6 +9,7 @@ committed as files. Use this document as the expected settings record.
 - [ ] Repository description: `Rust desktop UI for inspecting a local Floci AWS-compatible emulator`.
 - [ ] Topics: `rust`, `tauri`, `leptos`, `trunk`, `tailwindcss`, `aws`,
   `local-emulator`, `floci`, `desktop-app`.
+- [ ] Social preview image: `assets/floci-ui-repo-card.png`.
 - [ ] Issues: enabled.
 - [ ] Discussions: disabled unless maintainers commit to monitoring them.
 - [ ] Wiki: maintainer decision.

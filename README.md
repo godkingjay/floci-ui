@@ -1,5 +1,11 @@
 # Floci UI
 
+<p align="center">
+  <img src="assets/floci-ui-app-icon.png" alt="Floci UI app icon" width="96" height="96" />
+</p>
+
+![Floci UI banner](assets/floci-ui-readme-banner.svg)
+
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Rust 1.95](https://img.shields.io/badge/rust-1.95-orange.svg)](rust-toolchain.toml)
 [![Tauri 2](https://img.shields.io/badge/tauri-2-24c8db.svg)](https://tauri.app/)
@@ -17,6 +23,8 @@ hosts for `FLOCI_AWS_ENDPOINT_URL`.
 
 Floci UI is preparing for its first public source release. APIs, UI details, and
 packaging flow may change before `0.1.0`.
+
+Repository/social preview image: [assets/floci-ui-repo-card.png](assets/floci-ui-repo-card.png).
 
 Screenshot and GIF placeholders:
 

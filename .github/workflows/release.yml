@@ -20,7 +20,9 @@ concurrency:
 
 env:
   CARGO_INCREMENTAL: "0"
+  CARGO_PROFILE_DEV_DEBUG: "0"
   CARGO_PROFILE_RELEASE_DEBUG: "0"
+  CARGO_PROFILE_TEST_DEBUG: "0"
   CARGO_TERM_COLOR: always
   RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
@@ -65,6 +67,10 @@ jobs:
       - name: Check frontend
         run: cargo check --target wasm32-unknown-unknown
 
+      - name: Cleanup frontend target
+        if: always()
+        run: rm -rf target
+
       - name: Install Tauri Linux dependencies
         run: |
           sudo apt-get update
@@ -87,8 +93,12 @@ jobs:
       - name: Check Tauri
         run: cargo check --manifest-path src-tauri/Cargo.toml
 
+      - name: Cleanup Tauri target before tests
+        if: always()
+        run: rm -rf src-tauri/target
+
       - name: Test Tauri
-        run: cargo test --manifest-path src-tauri/Cargo.toml --all-features
+        run: cargo test --manifest-path src-tauri/Cargo.toml --all-features --lib --bins
 
   build:
     name: Build ${{ matrix.name }} bundle
