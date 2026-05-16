@@ -1,0 +1,10 @@
+/.local/
+/target/
+/src-tauri/target/
+/src-tauri/gen/
+/dist/
+/data/
+/node_modules/
+/styles.css
+/.env
+*.pdb

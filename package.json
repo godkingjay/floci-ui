@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "tailwind:build": "tailwindcss -i ./tailwind.css -o ./styles.css --minify",
+    "tailwind:watch": "tailwindcss -i ./tailwind.css -o ./styles.css --watch",
+    "trunk:build": "trunk build",
+    "trunk:serve": "trunk serve",
+    "dev:free-port": "node ./scripts/free-dev-port.mjs 1420",
+    "build": "npm run tailwind:build && npm run trunk:build",
+    "dev": "npm run dev:free-port && concurrently -k -n tailwind,trunk \"npm:tailwind:watch\" \"npm:trunk:serve\""
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "concurrently": "^9.2.1",
+    "tailwindcss": "^4.3.0"
+  }
+}
