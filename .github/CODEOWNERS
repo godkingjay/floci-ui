@@ -1,0 +1,10 @@
+# Replace this owner with the maintainer team before enabling branch protection.
+* @godkingjay
+
+/.github/ @godkingjay
+/src-tauri/ @godkingjay
+/src/ @godkingjay
+/docs/ @godkingjay
+/README.md @godkingjay
+/Cargo.toml @godkingjay
+/src-tauri/Cargo.toml @godkingjay

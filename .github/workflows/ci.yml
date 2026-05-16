@@ -2,21 +2,74 @@ name: CI
 
 on:
   push:
+    branches:
+      - master
   pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  CARGO_INCREMENTAL: "0"
+  CARGO_PROFILE_DEV_DEBUG: "0"
+  CARGO_PROFILE_TEST_DEBUG: "0"
+  CARGO_TERM_COLOR: always
 
 jobs:
   rust:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+
+      - name: Setup Rust 1.95
+        uses: dtolnay/rust-toolchain@1.95.0
+        with:
+          components: clippy,rustfmt
+          targets: wasm32-unknown-unknown
+
+      - name: Setup Trunk
+        uses: taiki-e/install-action@v2
+        with:
+          tool: trunk
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Frontend npm build
+        run: npm run build
+
+      - name: Cleanup npm artifacts
+        if: always()
+        run: rm -rf node_modules
+
+      - name: Rust frontend format
+        run: cargo fmt --all --check
+
+      - name: Rust frontend check
+        run: cargo check --target wasm32-unknown-unknown
+
+      - name: Rust frontend clippy
+        run: cargo clippy --target wasm32-unknown-unknown --all-features
+
+      - name: Cleanup frontend target
+        if: always()
+        run: rm -rf target
+
       - name: Install Tauri Linux dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
+          sudo apt-get install -y --no-install-recommends \
             build-essential \
             curl \
             file \
@@ -28,16 +81,21 @@ jobs:
             libssl-dev \
             pkg-config \
             wget
-      - run: npm ci
-      - run: npm run tailwind:build
-      - uses: dtolnay/rust-toolchain@1.85.0
-        with:
-          components: clippy,rustfmt
-          targets: wasm32-unknown-unknown
-      - run: cargo fmt --all --check
-      - run: cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
-      - run: cargo check --target wasm32-unknown-unknown
-      - run: cargo check --manifest-path src-tauri/Cargo.toml
-      - run: cargo clippy --target wasm32-unknown-unknown --all-features
-      - run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --all-features
-      - run: cargo test --manifest-path src-tauri/Cargo.toml --all-features
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+
+      - name: Tauri format
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+
+      - name: Tauri check
+        run: cargo check --manifest-path src-tauri/Cargo.toml
+
+      - name: Tauri clippy
+        run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --all-features
+
+      - name: Cleanup Tauri target before tests
+        if: always()
+        run: rm -rf src-tauri/target
+
+      - name: Tauri tests
+        run: cargo test --manifest-path src-tauri/Cargo.toml --all-features

@@ -1,0 +1,45 @@
+name: Feature request
+description: Propose a new capability or workflow improvement.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user problem should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior or workflow you want.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Include current workarounds or other designs you considered.
+    validations:
+      required: false
+  - type: dropdown
+    id: user-impact
+    attributes:
+      label: User impact
+      options:
+        - Blocks local emulator inspection
+        - Improves daily development workflow
+        - Improves documentation or onboarding
+        - Internal maintenance
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Implementation scope
+      description: Name affected services, screens, docs, or workflows if known.
+    validations:
+      required: false
