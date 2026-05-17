@@ -74,10 +74,5 @@ jobs:
           sudo apt-get clean
           sudo rm -rf /var/lib/apt/lists/*
 
-      - name: Tauri check
-        run: cargo check --manifest-path src-tauri/Cargo.toml
-
-      # `cargo check` compiles the Tauri binary target; library tests exercise
-      # backend behavior without recompiling the full binary test target.
       - name: Tauri library tests
         run: cargo test --manifest-path src-tauri/Cargo.toml --all-features --lib

@@ -82,9 +82,6 @@ jobs:
           sudo apt-get clean
           sudo rm -rf /var/lib/apt/lists/*
 
-      - name: Check Tauri
-        run: cargo check --manifest-path src-tauri/Cargo.toml
-
       - name: Test Tauri
         run: cargo test --manifest-path src-tauri/Cargo.toml --all-features --lib
 
