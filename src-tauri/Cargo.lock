@@ -2805,7 +2805,7 @@ dependencies = [
 
 [[package]]
 name = "floci-ui-tauri"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "aws-credential-types",
  "aws-sdk-acm",

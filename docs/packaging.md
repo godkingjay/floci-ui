@@ -42,6 +42,11 @@ Artifact names and extensions depend on the host platform and installed Tauri
 bundlers. Typical outputs include installers or app bundles under
 `src-tauri/target/release/bundle/`.
 
+The app bundle version is sourced from `package.json` through
+`src-tauri/tauri.conf.json`. Bump `package.json`, `Cargo.toml`, and
+`src-tauri/Cargo.toml` before tagging a release so artifact names, updater
+metadata, and the app-reported current version stay aligned.
+
 The automated release workflow uploads these artifacts to the draft GitHub
 release through the Tauri release action:
 

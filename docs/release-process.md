@@ -5,14 +5,19 @@ private because npm is used for build tooling.
 
 ## Versioning
 
-Use semantic version tags such as `v0.1.0`.
+Use semantic version tags such as `v0.1.2`.
 
-Update version values together:
+Use `package.json` as the source of truth for the Tauri app bundle version.
+Keep `src-tauri/tauri.conf.json` configured with `"version": "../package.json"`.
+
+Update these version values together before tagging:
 
 - `Cargo.toml`
 - `src-tauri/Cargo.toml`
-- `src-tauri/tauri.conf.json`
 - `package.json`
+
+The release workflow rejects tags that do not match these package versions, so a
+`v0.1.2` tag cannot publish `0.1.0` desktop assets.
 
 Do not change `package.json` from `"private": true` for normal desktop releases.
 
@@ -36,8 +41,8 @@ Do not change `package.json` from `"private": true` for normal desktop releases.
 Create an annotated tag:
 
 ```powershell
-git tag -a v0.1.0 -m "Floci UI v0.1.0"
-git push origin v0.1.0
+git tag -a v0.1.2 -m "Floci UI v0.1.2"
+git push origin v0.1.2
 ```
 
 Pushing a `v*` tag starts the release workflow. The workflow validates on Linux,
@@ -45,7 +50,7 @@ then builds native bundles on Linux, Windows, and macOS before creating one draf
 GitHub release.
 
 Manual runs can provide a release tag through the workflow input. The tag must
-start with `v`, such as `v0.1.0`, to avoid accidentally publishing a branch name.
+start with `v`, such as `v0.1.2`, to avoid accidentally publishing a branch name.
 
 ## Release Artifacts
 

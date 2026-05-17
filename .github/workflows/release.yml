@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag to publish, for example v0.1.0. Defaults to the current ref."
+        description: "Release tag to publish, for example v0.1.2. Defaults to the current ref."
         required: false
         type: string
 
@@ -36,10 +36,36 @@ jobs:
       - name: Validate release tag
         shell: bash
         run: |
+          set -euo pipefail
+
           if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+ ]]; then
-            echo "::error::Release tag must start with v, for example v0.1.0."
+            echo "::error::Release tag must start with v, for example v0.1.2."
             exit 1
           fi
+
+          expected_version="${RELEASE_TAG#v}"
+          package_version="$(grep -m1 '"version":' package.json | sed -E 's/.*"version": "([^"]+)".*/\1/')"
+          root_cargo_version="$(awk -F '"' '/^version = / { print $2; exit }' Cargo.toml)"
+          tauri_cargo_version="$(awk -F '"' '/^version = / { print $2; exit }' src-tauri/Cargo.toml)"
+          tauri_config_version="$(grep -m1 '"version":' src-tauri/tauri.conf.json | sed -E 's/.*"version": "([^"]+)".*/\1/')"
+
+          if [[ "$tauri_config_version" != "../package.json" ]]; then
+            echo "::error::src-tauri/tauri.conf.json must read version from ../package.json."
+            exit 1
+          fi
+
+          for version_entry in \
+            "package.json=$package_version" \
+            "Cargo.toml=$root_cargo_version" \
+            "src-tauri/Cargo.toml=$tauri_cargo_version"; do
+            version_file="${version_entry%%=*}"
+            version_value="${version_entry#*=}"
+
+            if [[ "$version_value" != "$expected_version" ]]; then
+              echo "::error::$version_file version $version_value does not match release tag $RELEASE_TAG."
+              exit 1
+            fi
+          done
 
   build:
     name: Build ${{ matrix.name }} bundle
