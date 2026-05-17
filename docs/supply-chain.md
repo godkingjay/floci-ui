@@ -40,14 +40,29 @@ When an advisory affects the project:
 3. Open a focused pull request.
 4. Document validation and release impact.
 
+Do not add advisory ignores as a first response. Update or reconfigure the
+dependency graph first, then use a temporary ignore only when there is no
+compatible fixed version or feature path.
+
+Every temporary advisory ignore must include:
+
+- the advisory ID and affected crate;
+- the direct dependency path that introduces it;
+- the reason the ignore is acceptable for Floci UI;
+- the owner responsible for tracking removal;
+- the removal trigger, such as an upstream release or a dependency replacement.
+
+Remove ignores in the same change that removes the affected package from the
+lockfile. Verify the removal with `cargo audit` and `cargo deny` against the
+affected manifest.
+
 ## Current Advisory Exceptions
 
 `deny.toml` records temporary advisory exceptions for transitive dependencies
 that are currently inherited through Leptos 0.6, Tauri's Linux GTK stack,
-Tauri URL pattern parsing, the test-only `httpmock` graph, or the AWS SDK's
-Rustls 0.21 verifier path. The app is still restricted to local HTTP emulator
-endpoints, and maintainers should remove each exception as upstream packages
-ship compatible fixes.
+Tauri URL pattern parsing, or the test-only `httpmock` graph. The app is still
+restricted to local HTTP emulator endpoints, and maintainers should remove each
+exception as upstream packages ship compatible fixes.
 
 ## Generated Artifacts
 
