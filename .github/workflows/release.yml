@@ -41,28 +41,6 @@ jobs:
             exit 1
           fi
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Setup Rust 1.95
-        uses: dtolnay/rust-toolchain@1.95.0
-        with:
-          targets: wasm32-unknown-unknown
-
-      - name: Setup Trunk
-        uses: taiki-e/install-action@v2
-        with:
-          tool: trunk
-
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Build frontend
-        run: npm run build
-
   build:
     name: Build ${{ matrix.name }} bundle
     runs-on: ${{ matrix.os }}

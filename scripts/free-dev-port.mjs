@@ -59,18 +59,6 @@ if (processIds.length === 0) {
   process.exit(0);
 }
 
-console.log(`Freeing dev port ${port} from process ${processIds.join(", ")}`);
-
-for (const processId of processIds) {
-  if (process.platform === "win32") {
-    run("taskkill.exe", ["/PID", String(processId), "/T", "/F"], { stdio: "inherit" });
-  } else {
-    try {
-      process.kill(processId, "SIGTERM");
-    } catch (error) {
-      if (error.code !== "ESRCH") {
-        throw error;
-      }
-    }
-  }
-}
+console.error(`Dev port ${port} is already in use by process ${processIds.join(", ")}.`);
+console.error("Stop that process, then rerun `npm run dev` or `cargo tauri dev`.");
+process.exit(1);
