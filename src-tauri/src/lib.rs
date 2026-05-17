@@ -46,6 +46,7 @@ impl AppState {
 /// or the desktop runtime cannot start.
 pub fn run() -> tauri::Result<()> {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             let _ = dotenvy::dotenv();
             let config = AppConfig::from_env()?;
