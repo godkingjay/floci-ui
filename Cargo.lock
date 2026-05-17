@@ -253,6 +253,7 @@ name = "floci-ui"
 version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
+ "futures",
  "icondata",
  "js-sys",
  "leptos",

@@ -45,6 +45,11 @@ fn env_value(name: &str, fallback: &str) -> String {
 }
 
 fn validate_local_endpoint(endpoint_url: &Url) -> Result<(), ConfigError> {
+    match endpoint_url.scheme() {
+        "http" | "https" => {}
+        scheme => return Err(ConfigError::UnsupportedEndpointScheme(scheme.to_owned())),
+    }
+
     match endpoint_url.host() {
         Some(Host::Domain(host)) if is_allowed_domain(host) => Ok(()),
         Some(Host::Ipv4(addr)) if addr.is_loopback() => Ok(()),
@@ -70,6 +75,8 @@ pub enum ConfigError {
     InvalidEndpointUrl(#[source] url::ParseError),
     #[error("FLOCI_AWS_ENDPOINT_URL must include a host")]
     MissingEndpointHost,
+    #[error("FLOCI_AWS_ENDPOINT_URL must use http or https, got {0}")]
+    UnsupportedEndpointScheme(String),
     #[error("refusing to connect to non-local Floci endpoint: {0}")]
     RemoteEndpoint(String),
 }
@@ -82,11 +89,11 @@ mod tests {
     fn allows_local_floci_endpoint_aliases() {
         let endpoints = [
             "http://localhost:4566",
+            "https://localhost.floci.io:4566",
             "http://127.0.0.1:4566",
             "http://[::1]:4566",
             "http://floci:4566",
             "http://host.docker.internal:4566",
-            "http://localhost.floci.io:4566",
             "http://s3.localhost.floci.io:4566",
             "http://s3.localhost.localstack.cloud:4566",
         ];
@@ -107,6 +114,16 @@ mod tests {
         assert!(matches!(
             validate_local_endpoint(&url),
             Err(ConfigError::RemoteEndpoint(host)) if host == "example.com"
+        ));
+    }
+
+    #[test]
+    fn rejects_unsupported_endpoint_scheme() {
+        let url = Url::parse("ftp://localhost:4566").expect("test URL should parse");
+
+        assert!(matches!(
+            validate_local_endpoint(&url),
+            Err(ConfigError::UnsupportedEndpointScheme(scheme)) if scheme == "ftp"
         ));
     }
 }
