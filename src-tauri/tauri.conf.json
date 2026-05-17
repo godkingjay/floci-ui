@@ -33,6 +33,15 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "createUpdaterArtifacts": true,
     "icon": ["icons/icon.ico", "icons/icon.png", "icons/icon.icns"]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDcyQTA5RjgyQ0E4RkIxMzEKUldReHNZL0tncCtnY2pkMHJvdVd5clRmWU5RbUdhOHlDT3IvVWdtY2c3RlhzS3FRMWVJUThIdS8K",
+      "endpoints": [
+        "https://github.com/godkingjay/floci-ui/releases/latest/download/latest.json"
+      ]
+    }
   }
 }

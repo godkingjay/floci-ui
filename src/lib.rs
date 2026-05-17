@@ -1,4 +1,5 @@
 pub mod app;
+pub mod app_update;
 pub mod commands;
 pub mod components;
 pub mod models;

@@ -102,6 +102,17 @@ loopback IPs and local emulator aliases:
 Remote hosts are rejected before the app starts. This protects contributors from
 accidentally pointing the UI at production or shared AWS-compatible endpoints.
 
+## App Updates
+
+Packaged desktop builds use the Tauri updater plugin to check GitHub Releases
+for update metadata. The updater endpoint is the public release asset
+`latest.json` for `godkingjay/floci-ui`.
+
+Update checks are separate from Floci service traffic. They do not send the
+configured Floci endpoint, AWS access key, service inventory, or local emulator
+details to GitHub. Service data continues to flow only through the Tauri backend
+commands that validate and use the local emulator endpoint.
+
 ## Packaging Boundary
 
 The root Rust package builds the frontend WASM app. `src-tauri/Cargo.toml` builds

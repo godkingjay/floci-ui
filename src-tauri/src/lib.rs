@@ -1,3 +1,4 @@
+mod app_update;
 mod commands;
 mod config;
 mod floci;
@@ -46,14 +47,18 @@ impl AppState {
 /// or the desktop runtime cannot start.
 pub fn run() -> tauri::Result<()> {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             let _ = dotenvy::dotenv();
             let config = AppConfig::from_env()?;
             let state = AppState::new(config)?;
             app.manage(state);
+            app.manage(app_update::AppUpdateState::default());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            app_update::app_update_check,
+            app_update::app_update_install,
             commands::floci_health,
             commands::service_catalog,
             commands::service_inventory,

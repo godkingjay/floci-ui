@@ -42,17 +42,28 @@ Artifact names and extensions depend on the host platform and installed Tauri
 bundlers. Typical outputs include installers or app bundles under
 `src-tauri/target/release/bundle/`.
 
-The automated release workflow collects these artifacts:
+The automated release workflow uploads these artifacts to the draft GitHub
+release through the Tauri release action:
 
 - Linux: `.AppImage`, `.deb`, and `.rpm`.
 - Windows: `.msi` and `.exe`.
 - macOS: `.dmg` and `.app.tar.gz`.
+- Updater metadata: `latest.json`.
+- Updater signatures: `.sig` files for signed updater bundles.
+
+`latest.json` is the metadata file installed apps read to discover available
+updates. Do not publish the draft release until this file and the expected
+signature files are present.
 
 ## Signing and Notarization
 
 Signing, notarization, and store distribution are not configured for the initial
 public source release. Unsigned local builds are suitable for maintainer testing
 and contributor validation only.
+
+Updater signing is separate from platform code signing. Release builds use
+`TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` from GitHub
+Actions secrets so Tauri can create updater signatures and `latest.json`.
 
 ## Unsupported Release Targets
 
@@ -72,4 +83,5 @@ Before attaching an artifact to a release:
 - Launch the packaged app.
 - Verify the app shows the expected endpoint and health status.
 - Verify remote endpoints are still rejected.
+- Verify updater metadata and `.sig` files are present on the draft release.
 - Record artifact checksums.
