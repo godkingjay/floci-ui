@@ -23,8 +23,13 @@ Do not change `package.json` from `"private": true` for normal desktop releases.
 3. Verify [SECURITY.md](../SECURITY.md) supported versions.
 4. Run the documented development checks.
 5. Build packages for each supported platform.
-6. Verify artifact names, checksums, and installer behavior.
-7. Draft release notes from the changelog and merged pull requests.
+6. Confirm the repository secrets `TAURI_SIGNING_PRIVATE_KEY` and
+   `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` are present and owned by maintainers
+   with release access.
+7. Verify artifact names, checksums, updater signatures, and installer
+   behavior.
+8. Confirm the draft release includes `latest.json` before publishing it.
+9. Draft user-facing release notes from the changelog and merged pull requests.
 
 ## Tagging
 
@@ -49,11 +54,22 @@ The release workflow attaches the native bundles produced by Tauri:
 - Linux: `.AppImage`, `.deb`, and `.rpm`.
 - Windows: `.msi` and `.exe`.
 - macOS: `.dmg` and a compressed `.app.tar.gz` app bundle.
+- Updater metadata: `latest.json`.
+- Updater signatures: `.sig` files for signed updater bundles.
 
 Windows and macOS artifacts are unsigned until maintainers add platform signing
 and notarization credentials.
 
+The updater signing private key must not be committed to the repository. Store
+it only in the GitHub Actions secret `TAURI_SIGNING_PRIVATE_KEY`. Store its
+password, when one exists, in `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`. Rotate both
+secrets together if the key is replaced.
+
 ## Release Notes
+
+Release notes should be written for end users because the app shows the release
+body inside the in-app update dialog. Keep the notes direct, concrete, and safe
+to display as plaintext.
 
 Release notes should include:
 
@@ -71,6 +87,8 @@ For each artifact:
 - Confirm it can connect to a local Floci endpoint.
 - Confirm it does not require production AWS credentials.
 - Record checksums.
+- Confirm `latest.json` is attached to the draft release before publishing it.
+- Confirm updater `.sig` assets are attached for signed updater bundles.
 
 Signing and notarization are not required for the first public source release
 unless maintainers add platform signing credentials.
@@ -79,8 +97,12 @@ unless maintainers add platform signing credentials.
 
 If a release is broken:
 
-1. Mark the GitHub release as pre-release or add a warning.
+1. Unpublish the GitHub release or mark it as pre-release with a clear warning.
 2. Remove broken artifacts if they are unsafe to use.
 3. Open a fix issue.
 4. Publish a patch tag such as `v0.1.1`.
 5. Document the rollback or replacement in the changelog.
+
+Installed apps can discover a published `latest.json`, so do not leave a broken
+updater release published without either unpublishing it or superseding it with
+a patch release.
