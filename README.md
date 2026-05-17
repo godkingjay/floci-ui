@@ -121,18 +121,17 @@ npm ci
 npm run build
 ```
 
-Run the CI-equivalent Rust formatting and backend tests:
+Run the CI-equivalent Rust formatting checks:
 
 ```powershell
 cargo +1.95.0 fmt --all --check
 cargo +1.95.0 fmt --manifest-path src-tauri/Cargo.toml --all --check
-cargo +1.95.0 test --manifest-path src-tauri/Cargo.toml --all-features --lib
 ```
 
-Run Clippy and Tauri checks locally before larger backend or native-shell
-refactors, or run the manual `Tauri Check` GitHub Actions workflow. They are no
-longer part of the default GitHub Actions gate to keep CI minutes focused on
-build and test signal.
+Run backend tests, Clippy, and Tauri checks locally before larger backend or
+native-shell refactors. For native-shell validation, you can also run the manual
+`Tauri Check` GitHub Actions workflow. These checks are no longer part of the
+default GitHub Actions gate to keep CI minutes focused on build and test signal.
 
 ## Troubleshooting
 

@@ -70,13 +70,13 @@ npm run build
 ```powershell
 cargo +1.95.0 fmt --all --check
 cargo +1.95.0 fmt --manifest-path src-tauri/Cargo.toml --all --check
-cargo +1.95.0 test --manifest-path src-tauri/Cargo.toml --all-features --lib
 ```
 
-Run Clippy and Tauri checks locally before larger backend or native-shell
-refactors, or run the manual `Tauri Check` GitHub Actions workflow. The default
-CI gate keeps formatting, frontend build, and backend library tests only so pull
-requests do not spend credits on duplicate compile lanes.
+Run backend tests, Clippy, and Tauri checks locally before larger backend or
+native-shell refactors. For native-shell validation, you can also run the manual
+`Tauri Check` GitHub Actions workflow. The default CI gate keeps formatting and
+frontend build only so pull requests do not spend credits on duplicate compile
+lanes.
 
 ## Common Failures
 
