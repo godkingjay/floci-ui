@@ -2,6 +2,7 @@ use leptos::*;
 use wasm_bindgen_futures::spawn_local;
 
 use crate::{
+    app_update::{AppUpdateInstallResult, AppUpdateSnapshot, UpdateCheckState},
     commands::invoke_command,
     models::{DashboardSnapshot, HealthSnapshot},
     routes::AppRoute,
@@ -52,6 +53,12 @@ pub struct AppStore {
     pub set_theme_preference: WriteSignal<ThemePreference>,
     pub theme_mode: ReadSignal<ThemeMode>,
     pub set_theme_mode: WriteSignal<ThemeMode>,
+    pub update: ReadSignal<UpdateCheckState>,
+    pub set_update: WriteSignal<UpdateCheckState>,
+    pub active_update: ReadSignal<Option<AppUpdateSnapshot>>,
+    pub set_active_update: WriteSignal<Option<AppUpdateSnapshot>>,
+    pub update_dialog_open: ReadSignal<bool>,
+    pub set_update_dialog_open: WriteSignal<bool>,
 }
 
 impl AppStore {
@@ -64,6 +71,9 @@ impl AppStore {
         let initial_preference = read_theme_preference();
         let (theme_preference, set_theme_preference) = create_signal(initial_preference);
         let (theme_mode, set_theme_mode) = create_signal(initial_preference.resolved_mode());
+        let (update, set_update) = create_signal(UpdateCheckState::Idle);
+        let (active_update, set_active_update) = create_signal(None);
+        let (update_dialog_open, set_update_dialog_open) = create_signal(false);
 
         Self {
             health,
@@ -80,6 +90,12 @@ impl AppStore {
             set_theme_preference,
             theme_mode,
             set_theme_mode,
+            update,
+            set_update,
+            active_update,
+            set_active_update,
+            update_dialog_open,
+            set_update_dialog_open,
         }
     }
 
@@ -106,6 +122,44 @@ impl AppStore {
             self.set_health.set(remote_result(health));
             self.set_catalog.set(remote_result(catalog));
             self.set_refresh.set(RefreshState::default());
+        });
+    }
+
+    pub fn check_for_updates(self) {
+        self.set_update.set(UpdateCheckState::Checking);
+
+        spawn_local(async move {
+            let update = invoke_command::<AppUpdateSnapshot>("app_update_check").await;
+
+            let state = match update {
+                Ok(snapshot) if snapshot.available => {
+                    self.set_active_update.set(Some(snapshot.clone()));
+                    UpdateCheckState::Available(snapshot)
+                }
+                Ok(_) => {
+                    self.set_active_update.set(None);
+                    UpdateCheckState::Unavailable
+                }
+                Err(message) => UpdateCheckState::Failed(message),
+            };
+
+            self.set_update.set(state);
+        });
+    }
+
+    pub fn install_update(self) {
+        self.set_update.set(UpdateCheckState::Installing);
+
+        spawn_local(async move {
+            let result = invoke_command::<AppUpdateInstallResult>("app_update_install").await;
+
+            let state = match result {
+                Ok(result) if result.installed => UpdateCheckState::Installed(result.message),
+                Ok(result) => UpdateCheckState::Failed(result.message),
+                Err(message) => UpdateCheckState::Failed(message),
+            };
+
+            self.set_update.set(state);
         });
     }
 

@@ -124,6 +124,24 @@ where
             "error": null
         }),
         "service_catalog" => preview_service_catalog(),
+        "app_update_check" if preview_update_available() => json!({
+            "available": true,
+            "current_version": env!("CARGO_PKG_VERSION"),
+            "version": "v9.9.9-preview",
+            "date": "2026-05-17T00:00:00Z",
+            "body": "Preview update release notes\n\n- Adds the update notification banner.\n- Shows release notes before installing.\n- Keeps browser preview safe without Tauri updater APIs."
+        }),
+        "app_update_check" => json!({
+            "available": false,
+            "current_version": env!("CARGO_PKG_VERSION"),
+            "version": null,
+            "date": null,
+            "body": null
+        }),
+        "app_update_install" => json!({
+            "installed": true,
+            "message": "Preview update flow completed."
+        }),
         "service_inventory" => browser_preview_inventory(args)?,
         "service_resource_detail" => browser_preview_resource_detail(args)?,
         "service_execute_action" => browser_preview_action(args)?,
@@ -142,6 +160,22 @@ where
     T: DeserializeOwned,
 {
     None
+}
+
+#[cfg(all(target_arch = "wasm32", debug_assertions))]
+fn preview_update_available() -> bool {
+    let Some(storage) = web_sys::window()
+        .and_then(|window| window.local_storage().ok())
+        .flatten()
+    else {
+        return false;
+    };
+
+    storage
+        .get_item("floci.previewUpdate")
+        .ok()
+        .flatten()
+        .is_some_and(|mode| mode.eq_ignore_ascii_case("available"))
 }
 
 #[cfg(all(target_arch = "wasm32", debug_assertions))]

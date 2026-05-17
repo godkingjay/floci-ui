@@ -17,6 +17,7 @@ pub fn App() -> impl IntoView {
 
     install_hash_route_listener(store.set_route);
     store.refresh_dashboard();
+    store.check_for_updates();
 
     view! {
         <AppShell store=store on_refresh=on_refresh on_toggle_theme=on_toggle_theme>
