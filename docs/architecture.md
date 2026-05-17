@@ -58,13 +58,17 @@ secret access key in dashboard snapshots.
 
 The Tauri webview uses a restrictive CSP in `src-tauri/tauri.conf.json`.
 Default content is limited to bundled app assets and Tauri asset URLs. Connect
-sources are limited to Tauri IPC plus the local Trunk development server on
-`localhost:1420` and `127.0.0.1:1420`, including websocket reload traffic.
+sources are limited to same-origin bundled app assets, Tauri IPC, and the local
+Trunk development server on `localhost:1420` and `127.0.0.1:1420`, including
+websocket reload traffic. Same-origin connect access is required because the
+Trunk bootstrap fetches the bundled WebAssembly file from `tauri.localhost` in
+packaged builds.
 
 `style-src` allows inline styles because generated frontend assets and UI
-styling still depend on them. `script-src` keeps scripts self-hosted and allows
-WebAssembly execution through `wasm-unsafe-eval`, which is required by the
-Leptos WASM frontend.
+styling still depend on them. `script-src` allows self-hosted scripts, the
+inline Trunk module bootstrap emitted into `dist/index.html`, and WebAssembly
+execution through `wasm-unsafe-eval`, which is required by the Leptos WASM
+frontend.
 
 `withGlobalTauri` remains enabled because the frontend command bridge currently
 uses `window.__TAURI__.core.invoke`. The local endpoint validation described

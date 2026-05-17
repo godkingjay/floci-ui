@@ -23,10 +23,10 @@
     "security": {
       "csp": {
         "default-src": "'self' asset:",
-        "connect-src": "ipc: http://ipc.localhost http://localhost:1420 ws://localhost:1420 http://127.0.0.1:1420 ws://127.0.0.1:1420",
+        "connect-src": "'self' ipc: http://ipc.localhost http://localhost:1420 ws://localhost:1420 http://127.0.0.1:1420 ws://127.0.0.1:1420",
         "img-src": "'self' asset: http://asset.localhost blob: data:",
         "style-src": "'self' 'unsafe-inline'",
-        "script-src": "'self' 'wasm-unsafe-eval'"
+        "script-src": "'self' 'unsafe-inline' 'wasm-unsafe-eval'"
       }
     }
   },
