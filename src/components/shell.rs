@@ -12,7 +12,9 @@ use leptos::{ev::MouseEvent, *};
 use leptos_icons::Icon;
 
 use crate::{
-    components::{Button, ButtonSize, ButtonVariant, StatusBadge, StatusTone},
+    components::{
+        Button, ButtonSize, ButtonVariant, StatusBadge, StatusTone, UpdateDialog, UpdateNotice,
+    },
     models::{DashboardSnapshot, HealthSnapshot},
     routes::AppRoute,
     state::{AppStore, RemoteData},
@@ -35,11 +37,13 @@ pub fn AppShell(
                     on_refresh=on_refresh
                     on_toggle_theme=on_toggle_theme
                 />
+                <UpdateNotice store=store />
                 <div class="compact-nav">
                     <ShellSidebar route=store.route compact=true />
                 </div>
                 <div class="shell-content">{children()}</div>
                 <HealthLiveRegion health=store.health />
+                <UpdateDialog store=store />
             </section>
         </main>
     }

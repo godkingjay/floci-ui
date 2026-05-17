@@ -6,6 +6,7 @@ pub mod navigation;
 pub mod panel;
 pub mod shell;
 pub mod table;
+pub mod update;
 
 pub use badge::{Badge, BadgeTone, ServiceCategoryBadge, StatusBadge, StatusTone};
 pub use button::{Button, ButtonSize, ButtonType, ButtonVariant};
@@ -17,3 +18,4 @@ pub use navigation::{BreadcrumbItem, Breadcrumbs, CommandBar, NavItem, SidebarNa
 pub use panel::{MetricTile, Panel, PanelHeader, SectionBand};
 pub use shell::{AppShell, EndpointIndicator, RefreshControl, ShellHeader, ShellSidebar};
 pub use table::{ColumnSpec, DataTable, RowActionSpec, SortDirection, SortState};
+pub use update::{UpdateDialog, UpdateNotice};

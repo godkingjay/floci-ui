@@ -164,6 +164,14 @@ where
 
 #[cfg(all(target_arch = "wasm32", debug_assertions))]
 fn preview_update_available() -> bool {
+    if web_sys::window()
+        .map(|window| window.location().search())
+        .unwrap_or_else(|| Err(JsValue::NULL))
+        .is_ok_and(|search| preview_update_query_available(&search))
+    {
+        return true;
+    }
+
     let Some(storage) = web_sys::window()
         .and_then(|window| window.local_storage().ok())
         .flatten()
@@ -176,6 +184,17 @@ fn preview_update_available() -> bool {
         .ok()
         .flatten()
         .is_some_and(|mode| mode.eq_ignore_ascii_case("available"))
+}
+
+#[cfg(all(target_arch = "wasm32", debug_assertions))]
+fn preview_update_query_available(search: &str) -> bool {
+    let query = search.strip_prefix('?').unwrap_or(search);
+
+    url::form_urlencoded::parse(query.as_bytes()).any(|(key, value)| {
+        let key_matches = key == "floci.previewUpdate";
+
+        key_matches && value.eq_ignore_ascii_case("available")
+    })
 }
 
 #[cfg(all(target_arch = "wasm32", debug_assertions))]
