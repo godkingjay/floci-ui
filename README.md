@@ -121,20 +121,17 @@ npm ci
 npm run build
 ```
 
-Run Rust formatting, checks, lints, and tests:
+Run the CI-equivalent Rust formatting, checks, and backend tests:
 
 ```powershell
 cargo +1.95.0 fmt --all --check
 cargo +1.95.0 fmt --manifest-path src-tauri/Cargo.toml --all --check
-cargo +1.95.0 check --target wasm32-unknown-unknown
 cargo +1.95.0 check --manifest-path src-tauri/Cargo.toml
-cargo +1.95.0 clippy --target wasm32-unknown-unknown --all-features
-cargo +1.95.0 clippy --manifest-path src-tauri/Cargo.toml --all-targets --all-features
-cargo +1.95.0 test --manifest-path src-tauri/Cargo.toml --all-features
+cargo +1.95.0 test --manifest-path src-tauri/Cargo.toml --all-features --lib
 ```
 
-If CI later splits the Tauri test command to control runner disk usage, keep this
-section aligned with the workflow.
+Run Clippy locally before larger refactors, but it is no longer part of the
+default GitHub Actions gate to keep CI minutes focused on build and test signal.
 
 ## Troubleshooting
 

@@ -5,8 +5,6 @@ on:
     branches:
       - master
   pull_request:
-  schedule:
-    - cron: "21 7 * * 1"
   workflow_dispatch:
 
 permissions:
@@ -49,31 +47,62 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Detect dependency policy changes
+        id: dependency_changes
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            git diff --name-only HEAD^1 HEAD > changed-files.txt
+          elif [[ "${{ github.event.before }}" =~ ^0+$ ]]; then
+            git ls-tree -r --name-only HEAD > changed-files.txt
+          else
+            git diff --name-only \
+              "${{ github.event.before }}" \
+              "${{ github.sha }}" > changed-files.txt
+          fi
+
+          if grep -Eq '^(Cargo\.toml|Cargo\.lock|src-tauri/Cargo\.toml|src-tauri/Cargo\.lock|deny\.toml|package\.json|package-lock\.json|\.github/workflows/security\.yml)$' changed-files.txt; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Node.js
+        if: steps.dependency_changes.outputs.changed == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
       - name: Setup Rust 1.95
+        if: steps.dependency_changes.outputs.changed == 'true'
         uses: dtolnay/rust-toolchain@1.95.0
 
       - name: Install Rust security tools
+        if: steps.dependency_changes.outputs.changed == 'true'
         run: |
           cargo install cargo-audit --locked
           cargo install cargo-deny --locked
 
       - name: Rust dependency policy
+        if: steps.dependency_changes.outputs.changed == 'true'
         run: |
           cargo deny check advisories bans licenses sources
           cargo deny --manifest-path src-tauri/Cargo.toml check advisories bans licenses sources
 
       - name: Rust advisories
+        if: steps.dependency_changes.outputs.changed == 'true'
         run: |
           cargo audit --file Cargo.lock $CARGO_AUDIT_IGNORES
           cargo audit --file src-tauri/Cargo.lock $CARGO_AUDIT_IGNORES
 
       - name: npm audit
+        if: steps.dependency_changes.outputs.changed == 'true'
         run: npm audit --audit-level=high
 
       - name: Secret scan

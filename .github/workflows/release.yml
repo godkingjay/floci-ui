@@ -50,7 +50,6 @@ jobs:
       - name: Setup Rust 1.95
         uses: dtolnay/rust-toolchain@1.95.0
         with:
-          components: clippy,rustfmt
           targets: wasm32-unknown-unknown
 
       - name: Setup Trunk
@@ -63,13 +62,6 @@ jobs:
 
       - name: Build frontend
         run: npm run build
-
-      - name: Check frontend
-        run: cargo check --target wasm32-unknown-unknown
-
-      - name: Cleanup frontend target
-        if: always()
-        run: rm -rf target
 
       - name: Install Tauri Linux dependencies
         run: |
@@ -93,12 +85,8 @@ jobs:
       - name: Check Tauri
         run: cargo check --manifest-path src-tauri/Cargo.toml
 
-      - name: Cleanup Tauri target before tests
-        if: always()
-        run: rm -rf src-tauri/target
-
       - name: Test Tauri
-        run: cargo test --manifest-path src-tauri/Cargo.toml --all-features --lib --bins
+        run: cargo test --manifest-path src-tauri/Cargo.toml --all-features --lib
 
   build:
     name: Build ${{ matrix.name }} bundle

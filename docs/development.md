@@ -70,12 +70,13 @@ npm run build
 ```powershell
 cargo +1.95.0 fmt --all --check
 cargo +1.95.0 fmt --manifest-path src-tauri/Cargo.toml --all --check
-cargo +1.95.0 check --target wasm32-unknown-unknown
 cargo +1.95.0 check --manifest-path src-tauri/Cargo.toml
-cargo +1.95.0 clippy --target wasm32-unknown-unknown --all-features
-cargo +1.95.0 clippy --manifest-path src-tauri/Cargo.toml --all-targets --all-features
-cargo +1.95.0 test --manifest-path src-tauri/Cargo.toml --all-features
+cargo +1.95.0 test --manifest-path src-tauri/Cargo.toml --all-features --lib
 ```
+
+Run Clippy locally before larger refactors. The default CI gate keeps formatting,
+frontend build, Tauri check, and backend library tests only so pull requests do
+not spend credits on duplicate compile lanes.
 
 ## Common Failures
 
