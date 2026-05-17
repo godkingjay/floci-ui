@@ -16,6 +16,7 @@ use crate::{
     },
 };
 
+#[allow(clippy::too_many_lines)]
 pub async fn list_resources(
     config: &AppConfig,
 ) -> Result<ServiceInventory, ServiceManagementError> {
@@ -40,26 +41,26 @@ pub async fn list_resources(
         let mut status = "available".to_owned();
         let mut created_at = None;
 
-        if let Ok(description) = client.describe_key().key_id(key_id).send().await {
-            if let Some(metadata) = description.key_metadata() {
-                status = metadata
-                    .key_state()
-                    .map(ToString::to_string)
-                    .unwrap_or(status);
-                created_at = format_timestamp(metadata.creation_date());
-                insert_attr(&mut attributes, "description", metadata.description());
-                insert_attr(
-                    &mut attributes,
-                    "key_usage",
-                    metadata.key_usage().map(ToString::to_string),
-                );
-                insert_attr(
-                    &mut attributes,
-                    "key_manager",
-                    metadata.key_manager().map(ToString::to_string),
-                );
-                insert_attr(&mut attributes, "enabled", Some(metadata.enabled()));
-            }
+        if let Ok(description) = client.describe_key().key_id(key_id).send().await
+            && let Some(metadata) = description.key_metadata()
+        {
+            status = metadata
+                .key_state()
+                .map(ToString::to_string)
+                .unwrap_or(status);
+            created_at = format_timestamp(metadata.creation_date());
+            insert_attr(&mut attributes, "description", metadata.description());
+            insert_attr(
+                &mut attributes,
+                "key_usage",
+                metadata.key_usage().map(ToString::to_string),
+            );
+            insert_attr(
+                &mut attributes,
+                "key_manager",
+                metadata.key_manager().map(ToString::to_string),
+            );
+            insert_attr(&mut attributes, "enabled", Some(metadata.enabled()));
         }
 
         resources.push(ResourceSummary {

@@ -61,8 +61,7 @@ pub async fn list_resources(
             status: load_balancer
                 .state()
                 .and_then(|state| state.code())
-                .map(|state| state.as_str().to_owned())
-                .unwrap_or_else(|| "available".to_owned()),
+                .map_or_else(|| "available".to_owned(), |state| state.as_str().to_owned()),
             created_at: format_timestamp(load_balancer.created_time()),
             updated_at: None,
             tags: BTreeMap::new(),
@@ -306,10 +305,10 @@ async fn load_listeners(
             id: format!("listener/{listener_arn}"),
             name,
             kind: "listener".to_owned(),
-            status: listener
-                .protocol()
-                .map(|protocol| protocol.as_str().to_owned())
-                .unwrap_or_else(|| "active".to_owned()),
+            status: listener.protocol().map_or_else(
+                || "active".to_owned(),
+                |protocol| protocol.as_str().to_owned(),
+            ),
             created_at: None,
             updated_at: None,
             tags: BTreeMap::new(),
@@ -407,10 +406,10 @@ async fn load_target_groups(
             id: format!("target-group/{target_group_arn}"),
             name: target_group_name.to_owned(),
             kind: "target-group".to_owned(),
-            status: target_group
-                .target_type()
-                .map(|target_type| target_type.as_str().to_owned())
-                .unwrap_or_else(|| "available".to_owned()),
+            status: target_group.target_type().map_or_else(
+                || "available".to_owned(),
+                |target_type| target_type.as_str().to_owned(),
+            ),
             created_at: None,
             updated_at: None,
             tags: BTreeMap::new(),
@@ -468,8 +467,10 @@ async fn load_targets(
             status: description
                 .target_health()
                 .and_then(|health| health.state())
-                .map(|state| state.as_str().to_owned())
-                .unwrap_or_else(|| "registered".to_owned()),
+                .map_or_else(
+                    || "registered".to_owned(),
+                    |state| state.as_str().to_owned(),
+                ),
             created_at: None,
             updated_at: None,
             tags: BTreeMap::new(),

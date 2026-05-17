@@ -38,6 +38,7 @@ const DEFAULT_POLICY_DOCUMENT: &str = r#"{
   ]
 }"#;
 
+#[allow(clippy::too_many_lines)]
 pub async fn list_resources(
     config: &AppConfig,
 ) -> Result<ServiceInventory, ServiceManagementError> {
@@ -84,8 +85,7 @@ pub async fn list_resources(
                     kind: "access-key".to_owned(),
                     status: access_key
                         .status()
-                        .map(ToString::to_string)
-                        .unwrap_or_else(|| "unknown".to_owned()),
+                        .map_or_else(|| "unknown".to_owned(), ToString::to_string),
                     created_at: format_timestamp(access_key.create_date()),
                     updated_at: None,
                     tags: BTreeMap::new(),

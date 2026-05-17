@@ -50,10 +50,10 @@ pub async fn list_resources(
             id: format!("api/{api_id}"),
             name: api_name.to_owned(),
             kind: "api".to_owned(),
-            status: api
-                .protocol_type()
-                .map(|protocol_type| protocol_type.as_str().to_owned())
-                .unwrap_or_else(|| "available".to_owned()),
+            status: api.protocol_type().map_or_else(
+                || "available".to_owned(),
+                |protocol_type| protocol_type.as_str().to_owned(),
+            ),
             created_at: format_timestamp(api.created_date()),
             updated_at: None,
             tags: api
@@ -288,10 +288,10 @@ async fn load_routes(
             id: format!("route/{api_id}/{route_id}"),
             name: route_key.to_owned(),
             kind: "route".to_owned(),
-            status: route
-                .authorization_type()
-                .map(|authorization_type| authorization_type.as_str().to_owned())
-                .unwrap_or_else(|| "NONE".to_owned()),
+            status: route.authorization_type().map_or_else(
+                || "NONE".to_owned(),
+                |authorization_type| authorization_type.as_str().to_owned(),
+            ),
             created_at: None,
             updated_at: None,
             tags: BTreeMap::new(),
@@ -348,10 +348,10 @@ async fn load_integrations(
                 .unwrap_or(integration_id)
                 .to_owned(),
             kind: "integration".to_owned(),
-            status: integration
-                .integration_type()
-                .map(|integration_type| integration_type.as_str().to_owned())
-                .unwrap_or_else(|| "configured".to_owned()),
+            status: integration.integration_type().map_or_else(
+                || "configured".to_owned(),
+                |integration_type| integration_type.as_str().to_owned(),
+            ),
             created_at: None,
             updated_at: None,
             tags: BTreeMap::new(),
@@ -461,10 +461,10 @@ async fn load_authorizers(
             id: format!("authorizer/{api_id}/{authorizer_id}"),
             name: authorizer_name.to_owned(),
             kind: "authorizer".to_owned(),
-            status: authorizer
-                .authorizer_type()
-                .map(|authorizer_type| authorizer_type.as_str().to_owned())
-                .unwrap_or_else(|| "configured".to_owned()),
+            status: authorizer.authorizer_type().map_or_else(
+                || "configured".to_owned(),
+                |authorizer_type| authorizer_type.as_str().to_owned(),
+            ),
             created_at: None,
             updated_at: None,
             tags: BTreeMap::new(),

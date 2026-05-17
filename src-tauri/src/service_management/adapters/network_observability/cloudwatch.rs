@@ -112,8 +112,10 @@ pub async fn execute_action(
             let datapoints = result.map_or(0, |result| result.values().len());
             let latest = result
                 .and_then(|result| result.values().first())
-                .map(|value| format!("{value:.4}"))
-                .unwrap_or_else(|| "no datapoints returned".to_owned());
+                .map_or_else(
+                    || "no datapoints returned".to_owned(),
+                    |value| format!("{value:.4}"),
+                );
 
             Ok(ActionResult {
                 changed: false,
@@ -239,8 +241,7 @@ async fn load_metric_alarms(
             kind: "alarm".to_owned(),
             status: alarm
                 .state_value()
-                .map(|state| state.as_str().to_owned())
-                .unwrap_or_else(|| "unknown".to_owned()),
+                .map_or_else(|| "unknown".to_owned(), |state| state.as_str().to_owned()),
             created_at: format_timestamp(alarm.alarm_configuration_updated_timestamp()),
             updated_at: format_timestamp(alarm.state_updated_timestamp()),
             tags: BTreeMap::new(),

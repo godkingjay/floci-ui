@@ -35,8 +35,7 @@ pub async fn list_resources(
             kind: "cluster".to_owned(),
             status: cluster
                 .state()
-                .map(ToString::to_string)
-                .unwrap_or_else(|| "active".to_owned()),
+                .map_or_else(|| "active".to_owned(), ToString::to_string),
             created_at: None,
             updated_at: None,
             tags: BTreeMap::new(),

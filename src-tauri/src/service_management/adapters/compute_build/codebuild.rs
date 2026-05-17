@@ -14,6 +14,7 @@ use crate::{
     },
 };
 
+#[allow(clippy::too_many_lines)]
 pub async fn list_resources(
     config: &AppConfig,
 ) -> Result<ServiceInventory, ServiceManagementError> {
@@ -101,8 +102,7 @@ pub async fn list_resources(
                         kind: "build".to_owned(),
                         status: build
                             .build_status()
-                            .map(ToString::to_string)
-                            .unwrap_or_else(|| "unknown".to_owned()),
+                            .map_or_else(|| "unknown".to_owned(), ToString::to_string),
                         created_at: format_timestamp(build.start_time()),
                         updated_at: format_timestamp(build.end_time()),
                         tags: BTreeMap::new(),

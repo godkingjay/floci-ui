@@ -57,8 +57,7 @@ pub async fn list_resources(
             kind: "rest-api".to_owned(),
             status: api
                 .api_status()
-                .map(|status| format!("{status:?}"))
-                .unwrap_or_else(|| "available".to_owned()),
+                .map_or_else(|| "available".to_owned(), |status| format!("{status:?}")),
             created_at: format_timestamp(api.created_date()),
             updated_at: None,
             tags: api
@@ -372,10 +371,10 @@ async fn load_child_resources(
                     id: format!("integration/{api_id}/{resource_id}/{http_method}"),
                     name: format!("{http_method} {path} integration"),
                     kind: "integration".to_owned(),
-                    status: integration
-                        .r#type()
-                        .map(|integration_type| format!("{integration_type:?}"))
-                        .unwrap_or_else(|| "configured".to_owned()),
+                    status: integration.r#type().map_or_else(
+                        || "configured".to_owned(),
+                        |integration_type| format!("{integration_type:?}"),
+                    ),
                     created_at: None,
                     updated_at: None,
                     tags: BTreeMap::new(),

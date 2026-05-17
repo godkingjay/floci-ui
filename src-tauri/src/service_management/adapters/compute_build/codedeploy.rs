@@ -14,6 +14,7 @@ use crate::{
     },
 };
 
+#[allow(clippy::too_many_lines)]
 pub async fn list_resources(
     config: &AppConfig,
 ) -> Result<ServiceInventory, ServiceManagementError> {
@@ -101,8 +102,7 @@ pub async fn list_resources(
                     );
                     status = info
                         .status()
-                        .map(ToString::to_string)
-                        .unwrap_or_else(|| status.clone());
+                        .map_or_else(|| status.clone(), ToString::to_string);
                     created_at = format_timestamp(info.create_time());
                 }
             }

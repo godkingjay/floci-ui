@@ -15,6 +15,7 @@ use crate::{
     },
 };
 
+#[allow(clippy::too_many_lines)]
 pub async fn list_resources(
     config: &AppConfig,
 ) -> Result<ServiceInventory, ServiceManagementError> {
@@ -44,8 +45,7 @@ pub async fn list_resources(
                 status: instance
                     .state()
                     .and_then(|state| state.name())
-                    .map(ToString::to_string)
-                    .unwrap_or_else(|| "unknown".to_owned()),
+                    .map_or_else(|| "unknown".to_owned(), ToString::to_string),
                 created_at: format_timestamp(instance.launch_time()),
                 updated_at: None,
                 tags: tags_to_map(instance.tags()),
@@ -65,8 +65,7 @@ pub async fn list_resources(
                 kind: "vpc".to_owned(),
                 status: vpc
                     .state()
-                    .map(ToString::to_string)
-                    .unwrap_or_else(|| "available".to_owned()),
+                    .map_or_else(|| "available".to_owned(), ToString::to_string),
                 created_at: None,
                 updated_at: None,
                 tags: tags_to_map(vpc.tags()),
@@ -103,8 +102,7 @@ pub async fn list_resources(
                 kind: "subnet".to_owned(),
                 status: subnet
                     .state()
-                    .map(ToString::to_string)
-                    .unwrap_or_else(|| "available".to_owned()),
+                    .map_or_else(|| "available".to_owned(), ToString::to_string),
                 created_at: None,
                 updated_at: None,
                 tags: tags_to_map(subnet.tags()),
@@ -183,8 +181,7 @@ pub async fn list_resources(
                 kind: "image".to_owned(),
                 status: image
                     .state()
-                    .map(ToString::to_string)
-                    .unwrap_or_else(|| "available".to_owned()),
+                    .map_or_else(|| "available".to_owned(), ToString::to_string),
                 created_at: image.creation_date().map(ToOwned::to_owned),
                 updated_at: None,
                 tags: tags_to_map(image.tags()),
@@ -213,8 +210,7 @@ pub async fn list_resources(
                 kind: "volume".to_owned(),
                 status: volume
                     .state()
-                    .map(ToString::to_string)
-                    .unwrap_or_else(|| "available".to_owned()),
+                    .map_or_else(|| "available".to_owned(), ToString::to_string),
                 created_at: format_timestamp(volume.create_time()),
                 updated_at: None,
                 tags: tags_to_map(volume.tags()),

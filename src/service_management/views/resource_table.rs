@@ -306,62 +306,40 @@ fn sort_header(
 
 fn resource_kind_icon(kind: &str) -> IconData {
     match kind {
-        "account-setting" => LuServer,
-        "access-key" => LuKeyRound,
-        "alias" => LuLink2,
-        "addon" => LuPackage,
         "alarm" => LuAlertTriangle,
-        "application" | "project" => LuPackageSearch,
         "api" | "rest-api" => LuWifi,
-        "auto-scaling-group" | "scaling-instance" => LuServer,
-        "authorizer" => LuShieldCheck,
-        "broker" | "container-instance" | "instance" | "node-group" => LuServer,
-        "build" | "deployment" | "invocation" | "report" => LuRefreshCw,
-        "bucket" => LuPackage,
-        "cache-cluster" | "replication-group" => LuServer,
-        "change-batch" => LuRefreshCw,
-        "change-set" => LuArchive,
-        "configuration"
-        | "configuration-preview"
-        | "configuration-profile"
-        | "request-template"
-        | "response-preview"
-        | "session-preview" => LuFileJson,
-        "certificate" | "caller-identity" => LuShieldCheck,
-        "connection" | "subscription" | "target" => LuLink2,
-        "database" | "db-instance" => LuDatabase,
-        "dead-letter-queue" => LuArchive,
-        "definition" => LuFileJson,
-        "deployment-group" => LuLink2,
-        "domain" | "event-bus" | "hosted-zone" | "rule" | "topic" => LuGlobe,
+        "application" | "project" => LuPackageSearch,
+        "change-set" | "dead-letter-queue" | "image" | "repository" | "snapshot" => LuArchive,
+        "database" | "db-instance" | "model" | "query-result" => LuDatabase,
         "dashboard" => LuLayoutDashboard,
         "file-system" => LuFolder,
-        "function" | "group" | "role" | "task" | "task-definition" | "user" | "user-pool" => {
-            LuPackage
-        }
         "health-check" => LuActivity,
-        "host-key" => LuKeyRound,
-        "image" | "repository" => LuArchive,
         "integration" | "listener" | "listener-rule" | "method" | "route" => LuCable,
-        "key" | "key-pair" | "key-policy" => LuKeyRound,
-        "lifecycle-hook" | "scaling-policy" => LuLink2,
-        "load-balancer" | "server" | "target-group" => LuServer,
-        "log-event" | "log-group" | "log-stream" => LuFileJson,
-        "metric-filter" | "subscription-filter" => LuTags,
-        "model" | "query-result" => LuDatabase,
-        "metric" | "send-statistic" => LuTable2,
-        "managed-instance" | "message" | "queue" => LuPackage,
-        "parameter" | "policy" | "queue-attribute" => LuTags,
-        "replay" => LuRefreshCw,
+        "access-key" | "host-key" | "key" | "key-pair" | "key-policy" => LuKeyRound,
+        "alias" | "app-client" | "connection" | "deployment-group" | "identity-provider"
+        | "instance-profile" | "lifecycle-hook" | "scaling-policy" | "subscription" | "target" => {
+            LuLink2
+        }
+        "account-setting" | "auto-scaling-group" | "broker" | "cache-cluster"
+        | "container-instance" | "instance" | "load-balancer" | "node-group"
+        | "replication-group" | "scaling-instance" | "server" | "stack" | "stack-event"
+        | "stack-resource" | "state-machine" | "stream" | "target-group" => LuServer,
+        "addon" | "bucket" | "function" | "group" | "managed-instance" | "message" | "queue"
+        | "role" | "task" | "task-definition" | "user" | "user-pool" => LuPackage,
+        "build" | "change-batch" | "deployment" | "invocation" | "replay" | "report" => LuRefreshCw,
+        "authorizer" | "certificate" | "caller-identity" | "secret" | "secret-version" => {
+            LuShieldCheck
+        }
+        "domain" | "event-bus" | "hosted-zone" | "rule" | "security-group" | "subnet" | "topic"
+        | "vpc" => LuGlobe,
+        "metric" | "send-statistic" | "table" | "tag" | "template" | "version"
+        | "hosted-version" => LuTable2,
+        "metric-filter" | "parameter" | "policy" | "queue-attribute" | "subscription-filter" => {
+            LuTags
+        }
         "record-set" => LuMapPin,
         "schedule" | "schedule-group" => LuCalendar,
-        "secret" | "secret-version" => LuShieldCheck,
-        "security-group" | "subnet" | "vpc" => LuGlobe,
-        "snapshot" => LuArchive,
-        "stack" | "stack-event" | "stack-resource" | "state-machine" | "stream" => LuServer,
         "stage" => LuCloudCog,
-        "table" | "tag" | "template" | "version" | "hosted-version" => LuTable2,
-        "app-client" | "identity-provider" | "instance-profile" => LuLink2,
         "validation" => LuCheckCircle2,
         "volume" => LuHardDrive,
         _ => LuFileJson,

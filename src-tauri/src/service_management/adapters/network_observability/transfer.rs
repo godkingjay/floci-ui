@@ -67,8 +67,7 @@ pub async fn list_resources(
             kind: "server".to_owned(),
             status: server
                 .state()
-                .map(|state| state.as_str().to_owned())
-                .unwrap_or_else(|| "available".to_owned()),
+                .map_or_else(|| "available".to_owned(), |state| state.as_str().to_owned()),
             created_at: None,
             updated_at: None,
             tags: BTreeMap::new(),
