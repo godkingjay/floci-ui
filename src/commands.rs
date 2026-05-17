@@ -101,7 +101,7 @@ where
     let value = match command {
         "floci_health" => json!({
             "ok": true,
-            "url": "http://localhost:4566/_localstack/health",
+            "url": "http://localhost:4566/_floci/health",
             "status": 200,
             "floci_version": "preview",
             "health_status": "running",
