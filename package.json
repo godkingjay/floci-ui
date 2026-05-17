@@ -20,7 +20,7 @@
   "scripts": {
     "tailwind:build": "tailwindcss -i ./tailwind.css -o ./styles.css --minify",
     "tailwind:watch": "tailwindcss -i ./tailwind.css -o ./styles.css --watch",
-    "trunk:build": "trunk build",
+    "trunk:build": "trunk build --release",
     "trunk:serve": "trunk serve",
     "dev:check-port": "node ./scripts/free-dev-port.mjs 1420",
     "build": "npm run tailwind:build && npm run trunk:build",

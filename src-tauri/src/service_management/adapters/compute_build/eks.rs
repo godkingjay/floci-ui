@@ -11,6 +11,7 @@ use crate::{
     },
 };
 
+#[allow(clippy::too_many_lines)]
 pub async fn list_resources(
     config: &AppConfig,
 ) -> Result<ServiceInventory, ServiceManagementError> {
@@ -23,39 +24,38 @@ pub async fn list_resources(
     let mut resources = Vec::new();
 
     for cluster_name in output.clusters() {
-        if let Ok(cluster_output) = client.describe_cluster().name(cluster_name).send().await {
-            if let Some(cluster) = cluster_output.cluster() {
-                let mut attributes = BTreeMap::new();
-                insert_attr(&mut attributes, "arn", cluster.arn());
-                insert_attr(&mut attributes, "endpoint", cluster.endpoint());
-                insert_attr(&mut attributes, "version", cluster.version());
-                insert_attr(
-                    &mut attributes,
-                    "platform_version",
-                    cluster.platform_version(),
-                );
+        if let Ok(cluster_output) = client.describe_cluster().name(cluster_name).send().await
+            && let Some(cluster) = cluster_output.cluster()
+        {
+            let mut attributes = BTreeMap::new();
+            insert_attr(&mut attributes, "arn", cluster.arn());
+            insert_attr(&mut attributes, "endpoint", cluster.endpoint());
+            insert_attr(&mut attributes, "version", cluster.version());
+            insert_attr(
+                &mut attributes,
+                "platform_version",
+                cluster.platform_version(),
+            );
 
-                resources.push(ResourceSummary {
-                    id: format!("cluster/{cluster_name}"),
-                    name: cluster_name.to_owned(),
-                    kind: "cluster".to_owned(),
-                    status: cluster
-                        .status()
-                        .map(ToString::to_string)
-                        .unwrap_or_else(|| "active".to_owned()),
-                    created_at: format_timestamp(cluster.created_at()),
-                    updated_at: None,
-                    tags: cluster
-                        .tags()
-                        .map(|tags| {
-                            tags.iter()
-                                .map(|(key, value)| (key.clone(), value.clone()))
-                                .collect()
-                        })
-                        .unwrap_or_default(),
-                    attributes,
-                });
-            }
+            resources.push(ResourceSummary {
+                id: format!("cluster/{cluster_name}"),
+                name: cluster_name.to_owned(),
+                kind: "cluster".to_owned(),
+                status: cluster
+                    .status()
+                    .map_or_else(|| "active".to_owned(), ToString::to_string),
+                created_at: format_timestamp(cluster.created_at()),
+                updated_at: None,
+                tags: cluster
+                    .tags()
+                    .map(|tags| {
+                        tags.iter()
+                            .map(|(key, value)| (key.clone(), value.clone()))
+                            .collect()
+                    })
+                    .unwrap_or_default(),
+                attributes,
+            });
         }
 
         if let Ok(nodegroups) = client
@@ -73,11 +73,10 @@ pub async fn list_resources(
                     .nodegroup_name(nodegroup_name)
                     .send()
                     .await
+                    && let Some(nodegroup) = nodegroup_output.nodegroup()
                 {
-                    if let Some(nodegroup) = nodegroup_output.nodegroup() {
-                        insert_attr(&mut attributes, "nodegroup_arn", nodegroup.nodegroup_arn());
-                        insert_attr(&mut attributes, "capacity_type", nodegroup.capacity_type());
-                    }
+                    insert_attr(&mut attributes, "nodegroup_arn", nodegroup.nodegroup_arn());
+                    insert_attr(&mut attributes, "capacity_type", nodegroup.capacity_type());
                 }
 
                 resources.push(ResourceSummary {

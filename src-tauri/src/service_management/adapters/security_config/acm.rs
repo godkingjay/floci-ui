@@ -13,6 +13,7 @@ use crate::{
     },
 };
 
+#[allow(clippy::too_many_lines)]
 pub async fn list_resources(
     config: &AppConfig,
 ) -> Result<ServiceInventory, ServiceManagementError> {
@@ -55,8 +56,7 @@ pub async fn list_resources(
 
         let mut status = certificate
             .status()
-            .map(ToString::to_string)
-            .unwrap_or_else(|| "unknown".to_owned());
+            .map_or_else(|| "unknown".to_owned(), ToString::to_string);
         let mut created_at = format_timestamp(certificate.created_at());
         let mut updated_at = format_timestamp(certificate.issued_at());
 
@@ -121,8 +121,7 @@ pub async fn list_resources(
                         kind: "validation".to_owned(),
                         status: validation
                             .validation_status()
-                            .map(ToString::to_string)
-                            .unwrap_or_else(|| "unknown".to_owned()),
+                            .map_or_else(|| "unknown".to_owned(), ToString::to_string),
                         created_at: None,
                         updated_at: None,
                         tags: BTreeMap::new(),

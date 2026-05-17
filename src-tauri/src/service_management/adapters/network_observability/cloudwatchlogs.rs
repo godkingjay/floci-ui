@@ -48,10 +48,10 @@ pub async fn list_resources(
             id: format!("log-group/{log_group_name}"),
             name: log_group_name.to_owned(),
             kind: "log-group".to_owned(),
-            status: group
-                .retention_in_days()
-                .map(|days| format!("{days}d retention"))
-                .unwrap_or_else(|| "never expire".to_owned()),
+            status: group.retention_in_days().map_or_else(
+                || "never expire".to_owned(),
+                |days| format!("{days}d retention"),
+            ),
             created_at: group.creation_time().map(|value| format!("{value} ms")),
             updated_at: None,
             tags: BTreeMap::new(),
@@ -245,8 +245,7 @@ async fn load_streams(
             kind: "log-stream".to_owned(),
             status: stream
                 .last_event_timestamp()
-                .map(|_| "active".to_owned())
-                .unwrap_or_else(|| "idle".to_owned()),
+                .map_or_else(|| "idle".to_owned(), |_| "active".to_owned()),
             created_at: stream.creation_time().map(|value| format!("{value} ms")),
             updated_at: stream
                 .last_event_timestamp()

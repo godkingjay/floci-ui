@@ -14,6 +14,7 @@ use crate::{
     },
 };
 
+#[allow(clippy::too_many_lines)]
 pub async fn list_resources(
     config: &AppConfig,
 ) -> Result<ServiceInventory, ServiceManagementError> {
@@ -30,8 +31,7 @@ pub async fn list_resources(
         };
         let parameter_type = parameter
             .r#type()
-            .map(ToString::to_string)
-            .unwrap_or_else(|| "Unknown".to_owned());
+            .map_or_else(|| "Unknown".to_owned(), ToString::to_string);
         let mut attributes = BTreeMap::new();
         insert_attr(&mut attributes, "arn", parameter.arn());
         insert_attr(&mut attributes, "type", Some(parameter_type.clone()));
@@ -96,8 +96,7 @@ pub async fn list_resources(
                 kind: "document".to_owned(),
                 status: document
                     .review_status()
-                    .map(ToString::to_string)
-                    .unwrap_or_else(|| "available".to_owned()),
+                    .map_or_else(|| "available".to_owned(), ToString::to_string),
                 created_at: format_timestamp(document.created_date()),
                 updated_at: None,
                 tags: BTreeMap::new(),
@@ -118,8 +117,7 @@ pub async fn list_resources(
                 kind: "command".to_owned(),
                 status: invocation
                     .status()
-                    .map(ToString::to_string)
-                    .unwrap_or_else(|| "unknown".to_owned()),
+                    .map_or_else(|| "unknown".to_owned(), ToString::to_string),
                 created_at: format_timestamp(invocation.requested_date_time()),
                 updated_at: None,
                 tags: BTreeMap::new(),
@@ -164,8 +162,7 @@ pub async fn list_resources(
                 kind: "managed-instance".to_owned(),
                 status: instance
                     .ping_status()
-                    .map(ToString::to_string)
-                    .unwrap_or_else(|| "unknown".to_owned()),
+                    .map_or_else(|| "unknown".to_owned(), ToString::to_string),
                 created_at: format_timestamp(instance.registration_date()),
                 updated_at: format_timestamp(instance.last_ping_date_time()),
                 tags: BTreeMap::new(),
@@ -208,8 +205,7 @@ pub async fn execute_action(
                 .unwrap_or(0);
             let value_type = parameter
                 .and_then(|parameter| parameter.r#type())
-                .map(ToString::to_string)
-                .unwrap_or_else(|| "Unknown".to_owned());
+                .map_or_else(|| "Unknown".to_owned(), ToString::to_string);
 
             Ok(ActionResult {
                 changed: false,

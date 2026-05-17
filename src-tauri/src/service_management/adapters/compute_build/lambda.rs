@@ -24,6 +24,7 @@ use crate::{
 const DEFAULT_HANDLER: &str = "bootstrap";
 const DEFAULT_ROLE_ARN: &str = "arn:aws:iam::000000000000:role/floci-lambda-local";
 
+#[allow(clippy::too_many_lines)]
 pub async fn list_resources(
     config: &AppConfig,
 ) -> Result<ServiceInventory, ServiceManagementError> {
@@ -55,8 +56,7 @@ pub async fn list_resources(
             kind: "function".to_owned(),
             status: function
                 .state()
-                .map(ToString::to_string)
-                .unwrap_or_else(|| "available".to_owned()),
+                .map_or_else(|| "available".to_owned(), ToString::to_string),
             created_at: function.last_modified().map(ToOwned::to_owned),
             updated_at: function.last_modified().map(ToOwned::to_owned),
             tags: BTreeMap::new(),
@@ -126,8 +126,7 @@ pub async fn list_resources(
                     kind: "version".to_owned(),
                     status: version
                         .state()
-                        .map(ToString::to_string)
-                        .unwrap_or_else(|| "available".to_owned()),
+                        .map_or_else(|| "available".to_owned(), ToString::to_string),
                     created_at: version.last_modified().map(ToOwned::to_owned),
                     updated_at: version.last_modified().map(ToOwned::to_owned),
                     tags: BTreeMap::new(),
@@ -160,8 +159,7 @@ pub async fn list_resources(
                 kind: "event-source-mapping".to_owned(),
                 status: mapping
                     .state()
-                    .map(ToOwned::to_owned)
-                    .unwrap_or_else(|| "enabled".to_owned()),
+                    .map_or_else(|| "enabled".to_owned(), ToOwned::to_owned),
                 created_at: format_timestamp(mapping.last_modified()),
                 updated_at: format_timestamp(mapping.last_modified()),
                 tags: BTreeMap::new(),

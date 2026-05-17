@@ -30,16 +30,16 @@ pub async fn list_resources(
         let mut created_at = None;
         let table_name = stream.table_name().map(ToOwned::to_owned);
 
-        if let Ok(detail) = client.describe_stream().stream_arn(stream_arn).send().await {
-            if let Some(description) = detail.stream_description() {
-                if let Some(label) = description.stream_label() {
-                    name = label.to_owned();
-                }
-                status = description
-                    .stream_status()
-                    .map_or_else(|| "unknown".to_owned(), ToString::to_string);
-                created_at = format_timestamp(description.creation_request_date_time());
+        if let Ok(detail) = client.describe_stream().stream_arn(stream_arn).send().await
+            && let Some(description) = detail.stream_description()
+        {
+            if let Some(label) = description.stream_label() {
+                name = label.to_owned();
             }
+            status = description
+                .stream_status()
+                .map_or_else(|| "unknown".to_owned(), ToString::to_string);
+            created_at = format_timestamp(description.creation_request_date_time());
         }
 
         let mut attributes = BTreeMap::from([("stream_arn".to_owned(), stream_arn.to_owned())]);
