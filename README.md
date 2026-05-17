@@ -136,6 +136,9 @@ default GitHub Actions gate to keep CI minutes focused on build and test signal.
 ## Troubleshooting
 
 - If Trunk cannot build, verify the `wasm32-unknown-unknown` target is installed.
+- If `cargo tauri dev` or `npm run dev` reports that port `1420` is already in
+  use, stop the listed process first. Floci UI checks the port before starting
+  but does not terminate existing listeners automatically.
 - If Tauri cannot start on Linux, install the Tauri platform prerequisites for
   WebKit, GTK, and related system libraries.
 - If the app rejects your endpoint, use a loopback URL or one of the supported
