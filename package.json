@@ -27,8 +27,8 @@
     "dev": "npm run dev:check-port && concurrently -k -n tailwind,trunk \"npm:tailwind:watch\" \"npm:trunk:serve\""
   },
   "devDependencies": {
-    "@tailwindcss/cli": "^4.3.0",
-    "concurrently": "^9.2.1",
+    "@tailwindcss/cli": "^4.3.1",
+    "concurrently": "^10.0.3",
     "tailwindcss": "^4.3.0"
   }
 }
